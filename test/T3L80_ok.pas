@@ -2,7 +2,6 @@
 
 (* There are no errors in this file. *)
 
-
 program T3L80_ok;
 
 var
@@ -42,7 +41,6 @@ procedure print_looping; External;
 procedure print_looping_looping; External;
 procedure print_looping_looping_looping; External;
 
-
 begin
    x := 9;
 
@@ -70,7 +68,6 @@ begin
 
    print_grooviest;
 
-
    a := -1;
 
    while a > 3 do
@@ -96,7 +93,6 @@ begin
       a := a+1
    end;
 
-
    x := 9;
 
    while x >= 0 do begin
@@ -106,7 +102,6 @@ begin
 
    if x <> 0 then
       x := 0;
-
 
    x := 3;
 

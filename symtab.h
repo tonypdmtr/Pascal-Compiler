@@ -12,7 +12,7 @@
 typedef void (*user_func)();
 
 /****************************************************************************/
-/* 
+/*
 	definitions for symbol table data record
 */
 
@@ -57,7 +57,7 @@ void stdr_dump(ST_DR stdr);
 */
 
 /****************************************************************************/
-/* 
+/*
 	definitions to support symtab.c
 
 	symtab.c implements a block structured symbol table for variables,
@@ -69,7 +69,7 @@ void stdr_dump(ST_DR stdr);
 
 /*
 ST_DR: name given to the type of the symbol table data records.
- 
+
 Symbol table does not need to know details of the data records.  Internally
 the symbol table will treat ST_DR as an OPAQUE type. The user simply should
 declare ST_DR to be a pointer to some record. The declaration of ST_DR
@@ -81,7 +81,6 @@ should be in this file and above this point.
 #ifndef ST_DEBUG
 #define ST_DEBUG 1
 #endif
-
 
 void  st_init_symtab(void);
 /*

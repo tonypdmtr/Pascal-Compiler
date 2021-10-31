@@ -1,6 +1,6 @@
 /*
  *
- *   backend-x86.h 
+ *   backend-x86.h
  *
  *   definitions and function prototypes for backend-x86.c
  *
@@ -9,7 +9,6 @@
 #ifndef BACKEND_H
 #define BACKEND_H
 #include "types.h"
-
 
 /* Macro and type definitions */
 
@@ -35,14 +34,11 @@ typedef enum { B_ADD, B_SUB, B_MULT, B_DIV, B_MOD,
 /* Increment and decrement operations */
 typedef enum { B_PRE_INC, B_POST_INC, B_PRE_DEC, B_POST_DEC } B_INC_DEC_OP;
 
-
-
 /**************************
  *                        *
  * Routines for Project 1 *
  *                        *
  **************************/
-
 
 /* b_global_decl emits the pseudo-op .data if beginning an data
    section.  In any case, it emits the pseudo-op .global for a global variable
@@ -71,7 +67,7 @@ void b_global_decl (char *id, int alignment, unsigned int size);
 
 /* The following seven functions emit code to allocate space for
    characters, short integers, integers, long integers, pointers, floats,
-   and doubles, respectively.  In all cases, init is a required 
+   and doubles, respectively.  In all cases, init is a required
    initialization for the variable.  b_global_decl should be called
    once beforehand for the variable name (see header comments for this
    function).
@@ -92,8 +88,6 @@ void b_alloc_double (double init);
    Use b_skip() after a truncated initialization list.  */
 
 void b_skip(unsigned int amount);
-
-
 
 /**************************
  *                        *
@@ -117,7 +111,6 @@ void b_skip(unsigned int amount);
 */
 void b_internal_pop (BOOLEAN display_flag);
 
-
 /***** Nullary operators (zero items popped) *****/
 
 /* b_duplicate pushes a duplicate of the datum currently on the stack.
@@ -125,7 +118,7 @@ void b_internal_pop (BOOLEAN display_flag);
 */
 void b_duplicate (TYPETAG type);
 
-/* b_push_ext_addr accepts a global variable name and emits 
+/* b_push_ext_addr accepts a global variable name and emits
    code to push the address of that variable onto the stack.
 */
 void b_push_ext_addr (char *id);
@@ -145,21 +138,20 @@ void b_push_loc_addr (int offset);
 void b_push_const_int (int value);
 
 /* b_push_const_double accepts a double value and emits code to
-   push that value onto the stack.  It does this by generating a new 
+   push that value onto the stack.  It does this by generating a new
    label for the value, inserting a labeled double value (two .long's)
-   into the .rodata section, and pushing the 8-byte value at the label 
+   into the .rodata section, and pushing the 8-byte value at the label
    onto the stack.
 */
 void b_push_const_double (double value);
 
 /* b_push_const_string accepts a string and emits code to "push
-   the string onto the stack."  It does this by generating a new 
-   label for the string, inserting a labeled line of ascii text 
-   into the .rodata section, and pushing the address of the label 
+   the string onto the stack."  It does this by generating a new
+   label for the string, inserting a labeled line of ascii text
+   into the .rodata section, and pushing the address of the label
    onto the stack.
 */
 void b_push_const_string (char *string);
-
 
 /***** Unary operators (one item popped) *****/
 
@@ -180,13 +172,13 @@ void b_deref (TYPETAG type);
 
 /* b_convert accepts a from_type and a to_type and emits code to
    convert a value of type from_type to a value of type to_type.
-   It assumes that there is a value of type from_type on the 
-   stack.  That value is popped off the stack, converted to a value 
+   It assumes that there is a value of type from_type on the
+   stack.  That value is popped off the stack, converted to a value
    of the to_type, and pushed back onto the stack.
 */
 void b_convert (TYPETAG from_type, TYPETAG to_type);
 
-/* b_negate accepts a type and emits code to negate a value of 
+/* b_negate accepts a type and emits code to negate a value of
    that type.  It assumes a value of that type is on the stack.
    It pops that value off the stack, negates it, and pushes it
    back onto the stack.
@@ -213,15 +205,14 @@ void b_negate (TYPETAG type);
 */
 void b_inc_dec (TYPETAG type, B_INC_DEC_OP idop, unsigned int size);
 
-
 /***** Binary operators (two items popped) *****/
 
 /* b_assign accepts a type and emits code to store a value of that
-   type in a variable OF THE SAME TYPE.  It assumes that a value of 
-   that type is at the top of the stack and that the address of the 
-   variable is the next item on the stack.  It pops both items off 
+   type in a variable OF THE SAME TYPE.  It assumes that a value of
+   that type is at the top of the stack and that the address of the
+   variable is the next item on the stack.  It pops both items off
    the stack, stores the value at the address, AND PUSHES THE VALUE
-   BACK ONTO THE STACK.  In other words, this is the code you would need 
+   BACK ONTO THE STACK.  In other words, this is the code you would need
    for assigning a value to a variable in C.  Note that it is assumed that
    the stack contains the actual address of the object, so for local
    variables and parameters, you must obtain the actual address beforehand
@@ -234,7 +225,7 @@ void b_assign (TYPETAG type);
    and a type.  The operators are:
 
         B_ADD       add (+)
-	B_SUB       substract (-) 
+	B_SUB       substract (-)
 	B_MULT      multiply (*)
 	B_DIV       divide (/)
 	B_MOD       mod (%)
@@ -244,9 +235,9 @@ void b_assign (TYPETAG type);
 	B_GE        greater than or equal to (>=)
 	B_EQ        equal (==)
 	B_NE        not equal (!=)
-   
-   It assumes that two values of the indicated type are on the 
-   stack.  It pops those values off the stack, performs the 
+
+   It assumes that two values of the indicated type are on the
+   stack.  It pops those values off the stack, performs the
    indicated operation, and pushes the resulting value onto
    the stack.
 
@@ -257,14 +248,13 @@ void b_assign (TYPETAG type);
    NOTE:  For arithmetic operators that are not commutative, it
           assumes that the operands were pushed onto the stack
 	  in left-to-right order (e.g. if the expression is
-	  x - y, y is at the top of the stack and x is the 
+	  x - y, y is at the top of the stack and x is the
 	  next item below it.
 
    NOTE:  For relational operators, a value of either 1 (true)
           or 0 (false) is pushed onto the stack.
 */
 void b_arith_rel_op (B_ARITH_REL_OP arop, TYPETAG type);
-
 
 /*****                                                                *****
  ***** Function defn, fcn call, local vars, param handling routines   *****
@@ -417,9 +407,9 @@ void b_alloc_arglist (int total_size);
    It determines where in the argument list to put the argument:
    whether the argument should be in a register or on the stack.
 
-   If the argument should be in a register, it emits code to move 
+   If the argument should be in a register, it emits code to move
    the value of that argument (assumed to be at the top of the
-   stack and of the proper type) from the stack to the proper 
+   stack and of the proper type) from the stack to the proper
    register.
 
    If the argument should be in the stack portion of the argument list,
@@ -463,7 +453,7 @@ void b_alloc_arglist (int total_size);
 void b_load_arg (TYPETAG type);
 
 /* b_funcall_by_name accepts a function name and a
-   return type for the function.  It emits code to jump to 
+   return type for the function.  It emits code to jump to
    that function, pop any space off the stack used for actual
    arguments upon returning from the function, and push the return
    value (if any) of the function onto the stack.  Uses
@@ -485,20 +475,17 @@ void b_load_arg (TYPETAG type);
 */
 void b_funcall_by_name (char *f_name, TYPETAG return_type);
 
-
-
 /**************************
  *                        *
  * Routines for Project 3 *
  *                        *
  **************************/
 
-
 /* b_label emits a label
 */
 void b_label (char *label);
 
-/* new_symbol generates unique symbols that can be used as 
+/* new_symbol generates unique symbols that can be used as
    labels in the assembly code being emitted.
 */
 char *new_symbol ();
@@ -513,7 +500,7 @@ void b_jump (char *label);
    on the stack and emits code that pops the value off the stack
    and does a conditional jump based on that value and the B_COND
    supplied.  For example, calling b_cond_jump with the arguments
-   TYSIGNEDINT, B_ZERO, and ".L1" generates code that pops an 
+   TYSIGNEDINT, B_ZERO, and ".L1" generates code that pops an
    integer off the stack and checks the value.  If it is zero it
    jumps to ".L1", otherwise it does not jump.
 
@@ -543,7 +530,7 @@ void b_cond_jump (TYPETAG type, B_COND cond, char *label);
    ".L1" occurs.
 
    Note:  The function "new_symbol" is the source of new labels.
-          Every time you call new_symbol you get a new label. 
+          Every time you call new_symbol you get a new label.
 
    Note:  See function b_cond_jump for a different type
           of conditional jump.
@@ -562,14 +549,11 @@ void b_dispatch (B_ARITH_REL_OP op, TYPETAG type, int cmp_value, char *label,
 */
 void b_encode_return (TYPETAG return_type);
 
-
-
 /**************************
  *                        *
  * Routines for Project 4 *
  *                        *
  **************************/
-
 
 /* b_ptr_arith_op takes an operator (which must be either B_ADD or B_SUB),
    the type of the second argument, and the size of object pointed to
@@ -591,9 +575,9 @@ void b_ptr_arith_op (B_ARITH_REL_OP arop, TYPETAG type, unsigned int size);
 
 /* b_funcall_by_ptr accepts the return type for a function, and when
    called, assumes that the entry address of the function is on top
-   of the stack.  It emits code to pop the entry address and jump to 
+   of the stack.  It emits code to pop the entry address and jump to
    that function, then upon return, pop any space for actual arguments
-   used by function, then finally push the return value (if any) of 
+   used by function, then finally push the return value (if any) of
    the function onto the stack.  Uses actual_no[aaa_top] to find
    the number of actual arguments of the call, and pops this
    value off of actual_no stack.  The entry address of the function
@@ -613,14 +597,11 @@ void b_ptr_arith_op (B_ARITH_REL_OP arop, TYPETAG type, unsigned int size);
 */
 void b_funcall_by_ptr (TYPETAG return_type);
 
-
-
 /**************************
  *                        *
  * Miscellaneous routines *
  *                        *
  **************************/
-
 
 /* This is the only backend routine that performs the actual return
    from a C function.  It is called from b_encode_return to execute a
@@ -634,7 +615,7 @@ static void b_void_return ();
 void emit( char *format, ... );
 
 /*  emitn prints printf strings to outfp with no end-of-line character
-*/ 
+*/
 void emitn( char *format, ... );
 
 /* b_lineno_comment generates a comment in the assembly code, displaying

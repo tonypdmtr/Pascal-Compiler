@@ -1,16 +1,14 @@
 #ifndef TREE_C
 #define TREE_C
-#include "types.h" 
-#include "symtab.h" 
-#include "message.h" 
-
+#include "types.h"
+#include "symtab.h"
+#include "message.h"
 
 extern ST_ID func_id_stack[BS_DEPTH];
 extern int fi_top;
 
 extern int base_offset_stack[BS_DEPTH];
 extern int bo_top;
-
 
 /* Possible expression types (tags) */
 typedef enum {
@@ -117,13 +115,12 @@ typedef struct exprnode {
 /* Procedure and function prototype directives */
 typedef enum { DIR_EXTERNAL, DIR_FORWARD } DIRECTIVE;
 
-
 /* Records the current function identifier to detect return value assigns */
 extern ST_ID func_id_stack[BS_DEPTH];
 extern int fi_top;
-   
-/* 
-This function creates a new type name data record and installs it in the symbol table. 
+
+/*
+This function creates a new type name data record and installs it in the symbol table.
 It takes two parameters; the name of the type name as a char array, and a type object.
 If the type name is already installed in the symbol table a warning message is issued.
 */
@@ -186,4 +183,3 @@ void case_value_list_free(VAL_LIST vals);
 BOOLEAN get_case_value(EXPR expr, long *val, TYPETAG *type);
 BOOLEAN check_for_preamble(EXPR var, EXPR init, EXPR limit);
 #endif
-

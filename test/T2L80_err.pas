@@ -25,16 +25,15 @@ Function w : Char; External;
 
 Function x : Single; External;
 
-
 begin
 
-   i := 5;		
+   i := 5;
    j := i;
    d := 19.1999;
 
    print_globals;		{ link in print_globals later }
 
-   k := i + j;		
+   k := i + j;
    j := i - k * k div (i + k);
 
    print_globals;
@@ -64,5 +63,5 @@ begin
    x := y = k;
    z := c * i + (-d) - x;
    b := (x < (i = 19));
-   
+
 end.

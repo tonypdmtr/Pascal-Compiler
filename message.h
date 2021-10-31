@@ -1,5 +1,5 @@
 /****************************************************************************/
-/* 
+/*
 	definitions to support message.c
 */
 
@@ -18,7 +18,6 @@ extern int compiler_warnings;
 /* Global Count of Compiler Messages */
 extern int compiler_messages;
 
-
 /****************************************************************/
 /* Available Message routines */
 
@@ -34,25 +33,24 @@ extern int compiler_messages;
 	      by calling the scanner routine sc_line.
  */
 
-
 /*********************************************************************/
 extern void msgn( char *format, ... );
     /*
-	this routine writes the message passed in to a specified 
+	this routine writes the message passed in to a specified
 		file with no newline added.
      */
 
 /*********************************************************************/
 extern void msg( char *format, ... );
     /*
-	this routine writes the message passed in to a specified 
+	this routine writes the message passed in to a specified
 		file with newline added.
      */
 
 /*********************************************************************/
 extern void message( char *format, ... );
     /*
-	this routine writes the message passed in to a specified 
+	this routine writes the message passed in to a specified
 		file with line number of source and newline added.
      */
 
@@ -87,7 +85,7 @@ extern void bug( char *format, ... );
      */
 
 /****************************************************************************/
-/* 
+/*
 	definitions to support utility routines
 */
 

@@ -10,7 +10,6 @@ var
    c   : Char;
    iaa : array[1..10, 1..5] of Integer;
 
-
 procedure print_nl; External;
 procedure print_dot; External;
 procedure print_even; External;
@@ -18,7 +17,6 @@ procedure print_odd; External;
 procedure print_j; External;
 procedure print_i_j_values; External;
 procedure print_oops; External;
-
 
 begin
 

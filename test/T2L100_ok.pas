@@ -67,11 +67,10 @@ Procedure print_globals;
       printf('d = %lf\nc = %u\n', d, c);
    end; { print_globals }
 
-
 begin
-   
+
    printf('this is a debugging message\n');
-   
+
    rst;
    d := get_real;
    c := get_character;
@@ -85,5 +84,5 @@ begin
    d := x * 2;
 
    print_globals
-   
+
 end.

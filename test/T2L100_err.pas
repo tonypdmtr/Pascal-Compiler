@@ -33,11 +33,10 @@ Function abc : Integer;
       abc := 19
    end; { abc }
 
-
 begin
-   
+
    printf('this is a debugging message\n');
-   
+
    xyz;
    rst;
    k := abc

@@ -11,9 +11,7 @@ var
    c	 : Char;
    b	 : Boolean;
 
-
 Procedure printf; External;
-
 
 Procedure swap(var a,b : Single);
    var
@@ -24,20 +22,19 @@ Procedure swap(var a,b : Single);
       b := tmp
    end; { swap }
 
-
 Procedure f(c : Integer);
    var
       i	: Integer;
    Procedure inner1;
       var
-	 i : Integer;	
+	 i : Integer;
       begin
 	 i := k;
 	 inner2 { error }
       end; { inner1 }
    Procedure inner2;
       var
-	 i : Single;	
+	 i : Single;
       begin
 	 inner { error }
       end; { inner2 }
@@ -46,7 +43,6 @@ Procedure f(c : Integer);
       inner1;
       inner2
    end; { f }
-
 
 Procedure g(var c1 : Char);
    var
@@ -72,7 +68,6 @@ Procedure g(var c1 : Char);
       f(f) { error }
    end; { g }
 
-
 { This procedure name won't conflict with the program's entry point,
  since each Pascal identifier's initial letter is capitalized.  Thus,
  procedure "main" becomes "Main". }
@@ -88,10 +83,9 @@ Procedure main;
       f(i,j);
       g(chr(i+5));
       swap(x,3.14);
-      
+
    end; { main }
 
-   
 begin
 
    main

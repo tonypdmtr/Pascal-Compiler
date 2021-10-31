@@ -2,14 +2,12 @@
 
 (* There are errors in this file. *)
 
-
 program T2L85;
 
 var
    a,b,c : Integer;
    x	 : Integer;
    z	 : Single;
-
 
 procedure print_abc; External;
 procedure print_x; External;
@@ -27,7 +25,6 @@ procedure print_inner_inner; External;
 procedure print_looping; External;
 procedure print_looping_looping; External;
 procedure print_looping_looping_looping; External;
-
 
 begin
    a := 1;
@@ -75,7 +72,6 @@ begin
 
    print_grooviest;
 
-
    a := -1;
 
    while a > 3 do
@@ -101,7 +97,6 @@ begin
       a := a+1
    end;
 
-
    x := 9;
 
    while true do begin
@@ -116,7 +111,6 @@ begin
       x := 0;
       break	{ error }
    end;
-
 
    x := 3;
 

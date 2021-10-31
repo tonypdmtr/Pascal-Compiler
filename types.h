@@ -1,5 +1,5 @@
 /****************************************************************************/
-/* 
+/*
 	definitions to support types.c
 */
 
@@ -71,8 +71,6 @@ typedef struct index {
     struct index *next, *prev;
 } INDEX, *INDEX_LIST;
 
-
-
 /* Routines to manipulate "TYPE" */
 
 void ty_types_init(void);
@@ -80,12 +78,10 @@ void ty_types_init(void);
     This routine initializes the types module data structures.
     */
 
-
 TYPETAG ty_query(TYPE type);
     /*
     This routine returns the actual type or tag value of the "TYPE".
     */
-
 
 BOOLEAN ty_test_equality(TYPE type1, TYPE type2);
     /*
@@ -96,10 +92,10 @@ BOOLEAN ty_test_equality(TYPE type1, TYPE type2);
 
 TYPE ty_strip_modifier(TYPE typein);
     /*
-    This routine takes 1 parameter of type "TYPE". If the 
+    This routine takes 1 parameter of type "TYPE". If the
     tag of the type is a modifier (ex. ptr,array,func,set,subrange)
     the routine will strip off the modifier and return
-    the remainder of the type. If the type sent in is not 
+    the remainder of the type. If the type sent in is not
     a modifier, it returns NULL.
     */
 

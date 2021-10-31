@@ -6,8 +6,6 @@
  *
  */
 
-
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -21,7 +19,6 @@
 /* Override external b_pop() definition with internal one. */
 #undef   b_pop
 #define  b_pop()  b_internal_pop(FALSE)
-
 
 #define errfp stderr
 #define outfp stdout       /* outfp is the file to which emit and emitn
@@ -98,22 +95,18 @@ static int loc_var_offset = 1;  /* Positive value is guaranteed illegal */
 static int formal_reg_no;
 #endif
 
-
 /* asm_section keeps track of the current section in the assembler. */
 static ASM_SECTION asm_section = SEC_NONE;
-
 
 /* flag to prevent the given floating point constant from being
    allocated twice. */
 static int double_zero_allocated = FALSE;
-
 
 /* Temporary locations for storing floats and doubles */
 static float global_float_val;
 #if 0
 static double global_double_val;
 #endif
-
 
 /* Function to calculate the least multiple of m that is >= x.
    Assumes m>0 and x>=0. */
@@ -122,8 +115,6 @@ static int next_multiple(int x, int m)
   x += m-1;
   return x - x%m;
 }
-
-
 
 /* Handle clean-up after a function call (called from both b_funcall_by_name()
  * and b_funcall_by_ptr()).
@@ -135,7 +126,6 @@ static int next_multiple(int x, int m)
  */
 static void post_call_clean_up (TYPETAG return_type, BOOLEAN is_name);
 
-
 /* Assumes the difference (in bytes) between two addresses is in %eax.  Emits
    code to divide this value by the given size parameter.  The result is left
    in %eax.  This function is used to compute the integer difference of two
@@ -146,8 +136,6 @@ static void post_call_clean_up (TYPETAG return_type, BOOLEAN is_name);
    size and %eax are arithmetically right-shifted beforehand. */
 static void divide_by_size(unsigned int size);
 
-
-
 /* Makes room on the stack for a temporary value */
 static void b_push()
 {
@@ -156,7 +144,6 @@ static void b_push()
     align_16_flip;
     #endif
 }
-
 
 /* Sets the FPU control word in anticipation of a conversion from
  * floating point to integer.
@@ -177,8 +164,6 @@ static void restore_fpu_control()
     emit ("\tfldcw\t%%dx");
 }
 
-
-
 /* Removes and discards a value from the top of the stack.  If passed TRUE,
    a comment is placed in the assembly code.  This function is used, for
    example, to discard the return value in an assignment statement or
@@ -195,8 +180,6 @@ void b_internal_pop (BOOLEAN display_flag)
   #endif
 }
 
-
-
 #if 0
 /* This is not available in SPARC assembler. */
 
@@ -209,11 +192,8 @@ void b_error (void)
 }
 #endif
 
-
-
 /* b_jump accepts a label and emits an unconditional jump to
    that label.  */
-
 
 void b_jump (char *label)
 {
@@ -222,17 +202,12 @@ void b_jump (char *label)
   emit ("\tjmp\t%s", label);
 }
 
-
-
-
-
-
 /* b_cond_jump accepts a TYPETAG, a B_COND (B_ZERO or B_NONZERO),
    and a label.  It assumes that there is a value of type "type"
    on the stack and emits code that pops the value off the stack
    and does a conditional jump based on that value and the B_COND
    supplied.  For example, calling b_cond_jump with the arguments
-   TYSIGNEDINT, B_ZERO, and ".L1" generates code that pops an 
+   TYSIGNEDINT, B_ZERO, and ".L1" generates code that pops an
    integer off the stack and checks the value.  If it is zero it
    jumps to ".L1", otherwise it does not jump.
 
@@ -241,7 +216,6 @@ void b_jump (char *label)
 
    Note:  See function b_dispatch for a different type of
           conditional jump.  */
-
 
 void b_cond_jump (TYPETAG type, B_COND cond, char *label)
 {
@@ -296,11 +270,6 @@ void b_cond_jump (TYPETAG type, B_COND cond, char *label)
   }
 }
 
-
-
-
-
-
 /* b_dispatch accepts a relational operator, a type, an integer
    comparison value, and a label.  The operator must be either B_EQ,
    B_NE, B_LT, B_LE, B_GT, or B_GE.  The type must be either
@@ -319,11 +288,10 @@ void b_cond_jump (TYPETAG type, B_COND cond, char *label)
    ".L1" occurs.
 
    Note:  The function "new_symbol" is the source of new labels.
-          Every time you call new_symbol you get a new label. 
+          Every time you call new_symbol you get a new label.
 
    Note:  See function b_cond_jump for a different type
           of conditional jump.  */
-
 
 void b_dispatch (B_ARITH_REL_OP op, TYPETAG type, int cmp_value, char *label,
 		 BOOLEAN pop_on_jump)
@@ -331,7 +299,7 @@ void b_dispatch (B_ARITH_REL_OP op, TYPETAG type, int cmp_value, char *label,
   char *temp_label = new_symbol();
   char *jmp_suffix;
   BOOLEAN is_signed;
-  
+
   emitn ("\t\t\t\t# b_dispatch ( %s,", b_arith_rel_op_string(op));
   my_print_typetag (type);
   emit  (", %d, %s, %s )", cmp_value, label,
@@ -387,13 +355,8 @@ void b_dispatch (B_ARITH_REL_OP op, TYPETAG type, int cmp_value, char *label,
   b_label (temp_label);
 }
 
-
-
-
-
 /* b_duplicate pushes a duplicate of the datum currently on the stack.
    The datum is assumed to be of the given type.  */
-
 
 void b_duplicate (TYPETAG type)
 {
@@ -439,14 +402,8 @@ void b_duplicate (TYPETAG type)
   }
 }
 
-
-
-
-
-
-/* b_push_ext_addr accepts a global variable name and emits 
+/* b_push_ext_addr accepts a global variable name and emits
    code to push the address of that variable onto the stack.  */
-
 
 void b_push_ext_addr (char *id)
 {
@@ -456,10 +413,6 @@ void b_push_ext_addr (char *id)
   emit ("\tmovl\t$%s, (%%esp)", id);
 }
 
-
-
-
-
 /* Added to unify assignment of local and global variables. -SF 2/3/96 */
 
 /* b_push_loc_addr accepts an offset value (from the frame pointer)
@@ -467,7 +420,6 @@ void b_push_ext_addr (char *id)
    onto the stack.  This is what you would call to get the actual address
    of a parameter or local variable onto the stack, given the offset
    value for the variable. */
-
 
 void b_push_loc_addr (int offset)
 {
@@ -478,15 +430,11 @@ void b_push_loc_addr (int offset)
   emit ("\tmovl\t%%eax, (%%esp)");
 }
 
-
-
-
 /* b_offset accepts an offset value as a parameter, and assumes some
    address is currently on the stack.  It pops the address and pushes
    the result obtained by adding the offset to the address.  This is
    useful both for finding members in structs and for following reference
    links in Pascal.  */
-
 
 void b_offset (int offset)
 {
@@ -497,15 +445,10 @@ void b_offset (int offset)
   emit ("\tmovl\t%%eax, (%%esp)");
 }
 
-
-
-
-
 /* b_deref accepts a type.  It assumes that the address of
    a variable of that type is on the stack.  It pops the
    address and pushes the value stored at that address
    onto the stack.   */
-
 
 void b_deref (TYPETAG type)
 {
@@ -549,13 +492,8 @@ void b_deref (TYPETAG type)
   }
 }
 
-
-
-
-
 /* b_push_const_int accepts an integer value and emits code to
    push that value onto the stack.  */
-
 
 void b_push_const_int (int value)
 {
@@ -566,17 +504,11 @@ void b_push_const_int (int value)
   emit ("\tmovl\t%%eax, (%%esp)");
 }
 
-
-
-
-
-
 /* b_push_const_double accepts a double value and emits code to
-   push that value onto the stack.  It does this by generating a new 
+   push that value onto the stack.  It does this by generating a new
    label for the value, inserting a labeled double value (two .long's)
-   into the .rodata section, and pushing the 8-byte value at the label 
+   into the .rodata section, and pushing the 8-byte value at the label
    onto the stack.  */
-
 
 void b_push_const_double (double value)
 {
@@ -586,7 +518,7 @@ void b_push_const_double (double value)
     bug("non-text assembler section in b_push_const_double");
 
   emit ("\t\t\t\t# b_push_const_double (%.16e)", value);
-  
+
   emit ("\t.section\t.rodata");
   emit ("\t.align\t%d", sizeof(double));
   b_label (label = new_symbol());
@@ -597,17 +529,11 @@ void b_push_const_double (double value)
   emit ("\tfstpl\t(%%esp)");
 }
 
-
-
-
-
-
 /* b_push_const_string accepts a string and emits code to "push
-   the string onto the stack."  It does this by generating a new 
-   label for the string, inserting a labeled line of ascii text 
-   into the .rodata section, and pushing the address of the label 
+   the string onto the stack."  It does this by generating a new
+   label for the string, inserting a labeled line of ascii text
+   into the .rodata section, and pushing the address of the label
    onto the stack.  */
-
 
 void b_push_const_string (char *string)
 {
@@ -625,19 +551,14 @@ void b_push_const_string (char *string)
   b_push_ext_addr (label);
 }
 
-
-
-
-
-
 /* Changed name of next procedure to b_assign. -SF 2/3/96 */
 
 /* b_assign accepts a type and emits code to store a value of that
-   type in a variable OF THE SAME TYPE.  It assumes that a value of 
-   that type is at the top of the stack and that the address of the 
-   variable is the next item on the stack.  It pops both items off 
+   type in a variable OF THE SAME TYPE.  It assumes that a value of
+   that type is at the top of the stack and that the address of the
+   variable is the next item on the stack.  It pops both items off
    the stack, stores the value at the address, AND PUSHES THE VALUE
-   BACK ONTO THE STACK.  In other words, this is the code you would need 
+   BACK ONTO THE STACK.  In other words, this is the code you would need
    for assigning a value to a variable in C.  Note that it is assumed that
    the stack contains the actual address of the object, so for local
    variables and parameters, you must obtain the actual address beforehand
@@ -683,21 +604,16 @@ void b_assign (TYPETAG type)
 
   emit (fetch_instr);
   b_pop ();
-  emit ("\tmovl\t(%%esp), %%eax");    
+  emit ("\tmovl\t(%%esp), %%eax");
   emit (put_instr, "(%eax)");
   emit (put_instr, "(%esp)");
 }
 
-
-
-
-
 /* b_convert accepts a from_type and a to_type and emits code to
    convert a value of type from_type to a value of type to_type.
-   It assumes that there is a value of type from_type on the 
-   stack.  That value is popped off the stack, converted to a value 
+   It assumes that there is a value of type from_type on the
+   stack.  That value is popped off the stack, converted to a value
    of the to_type, and pushed back onto the stack.  */
-
 
 void b_convert (TYPETAG from_type, TYPETAG to_type)
 {
@@ -720,10 +636,10 @@ void b_convert (TYPETAG from_type, TYPETAG to_type)
       emit ("\tmov%sbl\t%%al, %%eax", from_type==TYSIGNEDCHAR?"s":"z");
       emit ("\tmovl\t%%eax, (%%esp)");
           /* FALL THROUGH!!! */
-      
+
   case TYSIGNEDINT:
   case TYSIGNEDLONGINT:
-      
+
       switch (to_type) {
       case TYSIGNEDCHAR:
       case TYUNSIGNEDCHAR:
@@ -767,9 +683,9 @@ void b_convert (TYPETAG from_type, TYPETAG to_type)
 
   case TYFLOAT:
   case TYDOUBLE:
-          
+
       emit ("\tfld%s\t(%%esp)", from_type==TYDOUBLE?"l":"s");
-    
+
       switch (to_type) {
       case TYSIGNEDCHAR:
       case TYUNSIGNEDCHAR:
@@ -793,22 +709,16 @@ void b_convert (TYPETAG from_type, TYPETAG to_type)
 	  bug ("unsupported destination type in b_convert");
       }
       break;
-      
+
   default:
       bug ("unsupported source type in b_convert");
   }
 }
 
-
-
-
-
-
-/* b_negate accepts a type and emits code to negate a value of 
+/* b_negate accepts a type and emits code to negate a value of
    that type.  It assumes a value of that type is on the stack.
    It pops that value off the stack, negates it, and pushes it
    back onto the stack.  */
-
 
 void b_negate (TYPETAG type)
 {
@@ -826,7 +736,7 @@ void b_negate (TYPETAG type)
     emit ("\tnegl\t%%eax");
     emit ("\tmovl\t%%eax, (%%esp)");
     break;
-    
+
   case TYDOUBLE:
     emit ("\tfldl\t(%%esp)");
     emit ("\tfchs");
@@ -837,9 +747,6 @@ void b_negate (TYPETAG type)
     bug ("unsupported type in b_negate");
   }
 }
-
-
-
 
 /* Changed to treat uniformly global and local variables, and to
    allow arbitrary l-values (not just id's).  -SF 2/3/96 */
@@ -860,7 +767,6 @@ void b_negate (TYPETAG type)
    size should be the size (in bytes) of a datum pointed to by a
    pointer of this type. */
 
-
 void b_inc_dec (TYPETAG type, B_INC_DEC_OP idop, unsigned int size)
 {
     char *op, *ldsz = "l", *stsz = "l\t%eax", *fpsz;
@@ -877,7 +783,7 @@ void b_inc_dec (TYPETAG type, B_INC_DEC_OP idop, unsigned int size)
 
   emitn ("\t\t\t\t# b_inc_dec (");
   my_print_typetag (type);
-  emit (", %s)", idop == B_PRE_INC ? "PRE-INC" : 
+  emit (", %s)", idop == B_PRE_INC ? "PRE-INC" :
 	               idop == B_POST_INC ? "POS-INC" :
 	               idop == B_PRE_DEC ? "PRE-DEC" :
 	                                    "POST-DEC");
@@ -922,7 +828,7 @@ void b_inc_dec (TYPETAG type, B_INC_DEC_OP idop, unsigned int size)
       }
       emit ("\tmov%s, (%%edx)", stsz);
       break;
-    
+
   case TYFLOAT:
   case TYDOUBLE:
       emit ("\tfld%s\t(%%edx)", fpsz);
@@ -938,22 +844,17 @@ void b_inc_dec (TYPETAG type, B_INC_DEC_OP idop, unsigned int size)
       }
       emit ("\tfstp%s\t(%%edx)", fpsz);
       break;
-    
+
   default:
     bug ("unsupported type in b_inc_dec");
   }
 }
 
-
-
-
-
-
 /* b_arith_rel_op accepts a binary arithmetic or relational operator
    and a type.  The operators are:
 
         B_ADD       add (+)
-	B_SUB       substract (-) 
+	B_SUB       substract (-)
 	B_MULT      multiply (*)
 	B_DIV       divide (/)
 	B_MOD       mod (%)
@@ -963,9 +864,9 @@ void b_inc_dec (TYPETAG type, B_INC_DEC_OP idop, unsigned int size)
 	B_GE        greater than or equal to (>=)
 	B_EQ        equal (==)
 	B_NE        not equal (!=)
-   
-   It assumes that two values of the indicated type are on the 
-   stack.  It pops those values off the stack, performs the 
+
+   It assumes that two values of the indicated type are on the
+   stack.  It pops those values off the stack, performs the
    indicated operation, and pushes the resulting value onto
    the stack.
 
@@ -976,12 +877,11 @@ void b_inc_dec (TYPETAG type, B_INC_DEC_OP idop, unsigned int size)
    NOTE:  For arithmetic operators that are not commutative, it
           assumes that the operands were pushed onto the stack
 	  in left-to-right order (e.g. if the expression is
-	  x - y, y is at the top of the stack and x is the 
+	  x - y, y is at the top of the stack and x is the
 	  next item below it.
 
    NOTE:  For relational operators, a value of either 1 (true)
           or 0 (false) is pushed onto the stack.         */
-
 
 void b_arith_rel_op (B_ARITH_REL_OP arop, TYPETAG type)
 {
@@ -1002,11 +902,11 @@ void b_arith_rel_op (B_ARITH_REL_OP arop, TYPETAG type)
   case TYUNSIGNEDINT:
   case TYUNSIGNEDLONGINT:
       is_signed = (type==TYSIGNEDINT||type==TYSIGNEDLONGINT);
-      
+
       emit ("\tmovl\t(%%esp), %%ecx");
       b_pop();
       emit ("\tmovl\t(%%esp), %%eax");
-          
+
       switch (arop) {
       case B_ADD:
       case B_SUB:
@@ -1046,7 +946,7 @@ void b_arith_rel_op (B_ARITH_REL_OP arop, TYPETAG type)
                   arop==B_GT?"a":
                   arop==B_GE?"ae":
                   arop==B_EQ?"e":"ne";
-                  
+
           emit ("\tcmpl\t%%ecx, %%eax");
 	  emit ("\tset%s\t%%al", cmp_string);
 	  emit ("\tmovzbl\t%%al, %%eax");
@@ -1111,9 +1011,6 @@ void b_arith_rel_op (B_ARITH_REL_OP arop, TYPETAG type)
   }
 }
 
-
-
-
 /* b_ptr_arith_op takes an operator (which must be either B_ADD or B_SUB),
    the type of the second argument, and the size of object pointed to
    by the pointer argument(s).  It assumes that two values are on the
@@ -1130,7 +1027,6 @@ void b_arith_rel_op (B_ARITH_REL_OP arop, TYPETAG type)
    Note: this function does not handle pointer comparisons.  That is
    done in b_arith_rel_op. */
 
-
 void b_ptr_arith_op (B_ARITH_REL_OP arop, TYPETAG type, unsigned int size)
 {
   emitn ("\t\t\t\t# b_ptr_arith_op (%s, ", b_arith_rel_op_string (arop));
@@ -1143,7 +1039,7 @@ void b_ptr_arith_op (B_ARITH_REL_OP arop, TYPETAG type, unsigned int size)
   emit ("\tmovl\t(%%esp), %%edx");
   b_pop();
   emit ("\tmovl\t(%%esp), %%eax");
-  
+
   switch (type) {
   case TYSIGNEDINT:
   case TYUNSIGNEDINT:
@@ -1169,14 +1065,9 @@ void b_ptr_arith_op (B_ARITH_REL_OP arop, TYPETAG type, unsigned int size)
   emit ("\tmovl\t%%eax, (%%esp)");
 }
 
-
-
-
-
 /* b_func_prologue accepts a function name and generates the prologue
    for a function with that name.  It also initializes four static
    variables that are used in b_store_formal_param. */
-
 
 void b_func_prologue (char *f_name)
 {
@@ -1193,14 +1084,14 @@ void b_func_prologue (char *f_name)
        * initial value of align_16_adjust */
   align_16_adjust = TRUE;
   #endif
-  
+
   /* The first 6 arg registers will be copied starting with this one. */
   /* Don't need this, because C calling convention on x86 puts all args
    * onto the stack  -SF 4/4/2011 */
   #if 0
   formal_reg_no = 0;
   #endif
-  
+
   /* Stack locations for formal parameters start at %ebp+8.  If a local
    * function, then first parameter should be the function reference link. */
   caller_offset = FUNC_LINK_OFFSET;
@@ -1238,14 +1129,8 @@ void b_func_prologue (char *f_name)
       emit ("\tandl\t$-16, %%esp");
 }
 
-
-
-
-
-
 /* b_init_formal_param_offset does the same thing as b_func_prologue,
    but only initializes the offset variables and emits no assembly code. */
-
 
 void b_init_formal_param_offset ()
 {
@@ -1261,21 +1146,16 @@ void b_init_formal_param_offset ()
        * initial value of align_16_adjust */
   align_16_adjust = TRUE;
   #endif
-  
+
   #if 0
   /* The first 6 arg registers will be copied starting with this one. */
   formal_reg_no = 0;
   #endif
-  
+
   /* Stack locations for formal parameters start at %ebp+8.  If a local
    * function, then first parameter should be the function reference link. */
   caller_offset = FUNC_LINK_OFFSET;
 }
-
-
-
-
-
 
 /* b_store_formal_param accepts the type of a parameter.  It must be called
    for each formal parameter, immediately after b_func_prologue.  It determines
@@ -1309,7 +1189,6 @@ void b_init_formal_param_offset ()
    Var parameters (reference parameters) in Pascal should always be stored
    using TYPTR, regardless of their actual type.
 */
-
 
 int b_store_formal_param (TYPETAG type)
 {
@@ -1354,16 +1233,9 @@ int b_store_formal_param (TYPETAG type)
     return 0;	/* unreachable */
 }
 
-
-
-
-
-
-
 /* b_get_formal_param_offset does the same thing as b_store_formal_param
    except that it only updates the offset variables and returns the offset
    of the parameter, without generating any assembly code. */
-
 
 int b_get_formal_param_offset (TYPETAG type)
 {
@@ -1398,12 +1270,6 @@ int b_get_formal_param_offset (TYPETAG type)
     return 0;	/* unreachable */
 }
 
-
-
-
-
-
-
 /* b_alloc_return_value allocates on the stack space to hold the return
    value for the current function.  This is only required for Pascal
    functions, where the return value can be set/updated any number of
@@ -1420,12 +1286,6 @@ void b_alloc_return_value()
     return_value_offset = b_alloc_local_vars(STACK_ITEM);
 }
 
-
-
-
-
-
-
 /* b_alloc_local_vars accepts an integer and emits code to increase the
    stack by that number of bytes, adjusted upward to maintain quadword
    (8-byte) alignment of %esp.  This function should be used to allocate
@@ -1434,7 +1294,6 @@ void b_alloc_return_value()
    the amount of space taken up by the variables, as well as any padding
    necessary for alignment.  The offset (from %ebp) of the variable with
    lowest address is returned.  */
-
 
 int b_alloc_local_vars (int size)
 {
@@ -1450,7 +1309,7 @@ int b_alloc_local_vars (int size)
 
   if (new_space == 0)
       return loc_var_offset;
-  
+
   loc_var_offset -= new_space;
   emit ("\tsubl\t$%d, %%esp", new_space);
   #if 0
@@ -1459,9 +1318,6 @@ int b_alloc_local_vars (int size)
   #endif
   return loc_var_offset;
 }
-
-
-
 
 /* b_get_local_var_offset returns the current value of loc_var_offset.
    In Pascal, local variable offsets must be computed long before space
@@ -1476,14 +1332,10 @@ int b_alloc_local_vars (int size)
    passive--it emits no assembly code and has no effect on state
    variables.  */
 
-
 int b_get_local_var_offset()
 {
     return loc_var_offset;
 }
-
-
-
 
 /* b_dealloc_local_vars accepts an integer and emits code to decrease the
    stack by that number of bytes.  The stack pointer is restored
@@ -1494,7 +1346,6 @@ int b_get_local_var_offset()
    Note: This function is currently not needed, because we just leave
    the function no matter where the stack pointer is at the time.
    */
-
 
 void b_dealloc_local_vars (int size)
 {
@@ -1511,10 +1362,6 @@ void b_dealloc_local_vars (int size)
         align_16_flip;
     #endif
 }
-
-
-
-
 
 /* This is the only backend routine that performs the actual return
    from a C or Pascal function.  It is called from b_encode_return to
@@ -1537,15 +1384,8 @@ static void b_void_return (void)
     emit ("\tret");	/* control goes back to caller */
 }
 
-
-
-
-
-
-
 /* b_func_epilogue accepts the name of a function and emits code
    for the epilogue of a function by that name.  */
-
 
 void b_func_epilogue (char *f_name)
 {
@@ -1560,11 +1400,6 @@ void b_func_epilogue (char *f_name)
   loc_var_offset = 1;
 }
 
-
-
-
-
-
 /* b_set_return copies the value currently on the stack into the space
    designated for the return value, which should not be TYVOID.  The space
    designated for the return value is given by %ebp + return_value_offset.
@@ -1575,7 +1410,6 @@ void b_func_epilogue (char *f_name)
    This is only needed for Pascal functions, which can assign and update
    a return value anywhere, any number of times.
 */
-
 
 void b_set_return (TYPETAG return_type)
 {
@@ -1613,11 +1447,6 @@ void b_set_return (TYPETAG return_type)
   b_pop();
 }
 
-
-
-
-
-
 /* b_prepare_return prepares for a return from a Pascal function or Pascal
    procedure.  The type argument is the return type of the function
    (TYVOID for a procedure).  Does nothing if TYVOID; otherwise assumes the
@@ -1629,11 +1458,10 @@ void b_set_return (TYPETAG return_type)
    calling b_func_epilogue(), which does the actual return.
 */
 
-
 void b_prepare_return (TYPETAG return_type)
 {
   char *op_suffix = "l";
-    
+
   emitn ("\t\t\t\t# b_prepare_return (");
   my_print_typetag (return_type);
   emit  (")");
@@ -1669,10 +1497,6 @@ void b_prepare_return (TYPETAG return_type)
   }
 }
 
-
-
-
-
 /* b_encode_return encodes a return statement in a C function.  The type
    argument is the type of the return expression (after assignment
    conversion to the return type of the function) if there is one.  If
@@ -1683,11 +1507,10 @@ void b_prepare_return (TYPETAG return_type)
    This function is not needed for compiling standard Pascal.
 */
 
-
 void b_encode_return (TYPETAG return_type)
 {
   char *op_suffix = "l";
-    
+
   emitn ("\t\t\t\t# b_encode_return (");
   my_print_typetag (return_type);
   emit  (")");
@@ -1709,18 +1532,13 @@ void b_encode_return (TYPETAG return_type)
       emit ("\tfld%s\t(%%esp)", return_type==TYFLOAT?"s":"l");
       break;
   case TYVOID:
-      break;	
+      break;
   default:
       bug("b_encode_return: illegal return type");
   }
 
   b_void_return ();
 }
-
-
-
-
-
 
 /* b_alloc_arglist takes the total size (in bytes) of actual arguments in a
    function call, and allocates space on the stack for the actual argument
@@ -1738,7 +1556,6 @@ void b_encode_return (TYPETAG return_type)
    must be followed (as in matching parentheses) by a call to either
    b_funcall_by_name or b_funcall_by_ptr, with zero or more calls to
    b_load_arg in between.  */
-
 
 void b_alloc_arglist (int total_size)
 {
@@ -1787,7 +1604,7 @@ void b_alloc_arglist (int total_size)
     emit ("\tandl\t$-16, %%esp");
         /* Store the old %%esp right here, before allocating arguments */
     emit ("\tmovl\t%%eax, (%%esp)");
-    
+
         /* Allocate space for the arguments.  16-byte alignment of %esp
          * is preserved, because arg_space is a multiple of 16. */
     emit ("\tsubl\t$%d, %%esp", arg_space);
@@ -1798,19 +1615,14 @@ void b_alloc_arglist (int total_size)
     #endif
 }
 
-
-
-
-
-
 /* b_load_arg accepts the type of an argument in a function call,
    and assumes that a value of this type is on top of the stack.
    It determines where in the argument list to put the argument:
    whether the argument should be in a register or on the stack.
 
-   If the argument should be in a register, it emits code to move 
+   If the argument should be in a register, it emits code to move
    the value of that argument (assumed to be at the top of the
-   stack and of the proper type) from the stack to the proper 
+   stack and of the proper type) from the stack to the proper
    register.
 
    If the argument should be in the stack portion of the argument list,
@@ -1851,7 +1663,6 @@ void b_alloc_arglist (int total_size)
    Note also that b_load_arg does NOT leave the value of the argument on
    the stack, i.e., the value is popped.    */
 
-
 void b_load_arg (TYPETAG type)
 {
     int word_count = actual_arg_word_count[aaa_top];
@@ -1890,11 +1701,8 @@ void b_load_arg (TYPETAG type)
   actual_arg_word_count[aaa_top] = word_count;
 }
 
-
-
-
 /* b_funcall_by_name accepts a function name and a
-   return type for the function.  It emits code to jump to 
+   return type for the function.  It emits code to jump to
    that function, pop any space off the stack used for actual
    arguments upon returning from the function, and push the return
    value (if any) of the function onto the stack.  Uses
@@ -1927,16 +1735,11 @@ void b_funcall_by_name (char *f_name, TYPETAG return_type)
   post_call_clean_up (return_type, TRUE);
 }
 
-
-
-
-
-
 /* b_funcall_by_ptr accepts the return type for a function, and when
    called, assumes that the entry address of the function is on top
-   of the stack.  It emits code to pop the entry address and jump to 
+   of the stack.  It emits code to pop the entry address and jump to
    that function, then upon return, pop any space for actual arguments
-   used by function, then finally push the return value (if any) of 
+   used by function, then finally push the return value (if any) of
    the function onto the stack.  Uses actual_arg_space[aa_top] to find
    the total space used by the actual arguments of the call, and pops
    this value off of the actual_arg_space stack.  The entry address of
@@ -1954,7 +1757,6 @@ void b_funcall_by_name (char *f_name, TYPETAG return_type)
    latter assumes the entry address of the function has been pushed
    onto the stack.  */
 
-
 void b_funcall_by_ptr (TYPETAG return_type)
 {
   emitn ("\t\t\t\t# b_funcall_by_ptr (");
@@ -1969,11 +1771,6 @@ void b_funcall_by_ptr (TYPETAG return_type)
 
   post_call_clean_up (return_type, FALSE);
 }
-
-
-
-
-
 
 /* b_global_decl emits the pseudo-op .data if beginning a data
    section.  In any case, it emits the pseudo-op .global for a global variable
@@ -1999,7 +1796,6 @@ void b_funcall_by_ptr (TYPETAG return_type)
    b_alloc_int(0, 7);
    */
 
-
 void b_global_decl (char *id, int alignment, unsigned int size)
 {
   emit ("\t\t\t\t# b_global_decl (%s, alignment = %d, size = %u)", id, alignment, size);
@@ -2015,19 +1811,15 @@ void b_global_decl (char *id, int alignment, unsigned int size)
   b_label (id);
 }
 
-
-
-
 #if 0
 
 /* Should no longer be needed, since undefined is treated as global anyway.
    -SF 2/13/96 */
 
-/* b_global_func_decl emits the pseudo-op .data if beginning a data 
+/* b_global_func_decl emits the pseudo-op .data if beginning a data
    section.  In any case, it emits the pseudo-op .globl followed
    by the function name supplied.  This is the code needed for a
    function declaration.  */
-
 
 void b_global_func_decl (char *func_name)
 {
@@ -2042,13 +1834,9 @@ void b_global_func_decl (char *func_name)
 
 #endif
 
-
-
-
-
 /* The following seven functions emit code to allocate space for
    characters, short integers, integers, long integers, pointers, floats,
-   and doubles, respectively.  In all cases, init is a required 
+   and doubles, respectively.  In all cases, init is a required
    initialization for the variable.  b_global_decl should be called
    once beforehand for the variable name (see header comments for this
    function).
@@ -2057,47 +1845,36 @@ void b_global_func_decl (char *func_name)
    constant) as the first argument to b_alloc_ptr().
 */
 
-
 void b_alloc_char (int init)
 {
   emit ("\t.byte\t%d", init);
 }
-
-
 
 void b_alloc_short (int init)
 {
     emit ("\t.value\t%d", init);
 }
 
-
-
 void b_alloc_int (int init)
 {
   emit ("\t.long\t%d", init);
 }
-
-
 
 void b_alloc_long (long init)
 {
   emit ("\t.long\t%ld", init);
 }
 
-
-
 void b_alloc_ptr (char *init)
 {
   emit ("\t.long\t%s", init);
 }
-
 
 void b_alloc_float (double init)
 {
   global_float_val = (float)init;
   emit ("\t.long\t%d", *(int *)&global_float_val);
 }
-
 
 void b_alloc_double (double init)
 {
@@ -2117,10 +1894,6 @@ void b_alloc_double (double init)
     #endif
 }
 
-
-
-
-
 /* b_skip() allocates a given number of bytes of space in static storage.
    These bytes are zeroed.  Use b_skip() after a truncated
    initialization list.  */
@@ -2130,59 +1903,37 @@ void b_skip(unsigned int amount)
   emit ("\t.zero\t%u", amount);
 }
 
-
-
-
 /*  emit prints printf strings to outfp  */
 
-				
-void emit( char *format, ... )      
+void emit( char *format, ... )
 {
-        va_list ap;  
+        va_list ap;
 	va_start (ap, format);
 	vfprintf(outfp, format, ap);
 	va_end (ap);
 	putc ('\n', outfp);
 }
-     
 
+/*  emitn prints printf strings to outfp with no end-of-line character  */
 
-
-
-
-/*  emitn prints printf strings to outfp with no end-of-line character  */ 
-
-			
-void emitn( char *format, ... )      
+void emitn( char *format, ... )
 {
-        va_list ap;  
+        va_list ap;
 	va_start (ap, format);
 	vfprintf(outfp, format, ap);
 	va_end (ap);
-		
+
 }
 
-
-
-
-
-
 /* b_label emits a label */
-
 
 void b_label (char *label)
 {
   emit ("%s:", label);
 }
 
-
-
-
-
-
-/* new_symbol generates unique symbols that can be used as 
+/* new_symbol generates unique symbols that can be used as
    local labels in the assembly code being emitted.  */
-
 
 char *new_symbol ()
 {
@@ -2196,10 +1947,6 @@ char *new_symbol ()
       bug( "new_symbol: out of memory" );
   return ret;
 }
-
-
-
-
 
 /* Handle clean-up after a function call (called from both b_funcall_by_name()
  * and b_funcall_by_ptr()).
@@ -2227,14 +1974,14 @@ static void post_call_clean_up (TYPETAG return_type, BOOLEAN is_name)
        * in %eax or in (%edx,%eax) */
   emit ("\tmovl\t(%%esp), %%ecx");
   emit ("\tmovl\t%%ecx, %%esp");
-  
+
   #if 0
   align_16_adjust = (arg_space%16 != 0);
   #endif
 
   if (return_type == TYVOID)
       return;
-  
+
       /* Non-void return.  Make room to push the return value. */
   b_push ();
 
@@ -2263,11 +2010,8 @@ static void post_call_clean_up (TYPETAG return_type, BOOLEAN is_name)
 
   default:
       bug ("unsupported type in b_funcall_by_%s", is_name?"name":"ptr");
-  }                                        
+  }
 }
-
-
-
 
 static void divide_by_size(unsigned int size)
 {
@@ -2309,33 +2053,24 @@ static void divide_by_size(unsigned int size)
     emit("\timull\t$%d, %%eax, %%eax", prev);
 }
 
-
-
-
 /* b_lineno_comment generates a comment in the assembly code, displaying
    the given number.  It should be called from scan.l to generate the number
    of the new line as soon as a '\n' is detected in the source file. */
-
 
 void b_lineno_comment (int lineno)
 {
   emit (" #%5d", lineno);
 }
 
-
-
-
-
 /* b_arith_rel_op_string accepts an arithmetic/relational
    operator of type B_ARITH_REL_OP and returns a string
    indicating the nature of the arithmetic or relational
    operator.  */
 
-
 char *b_arith_rel_op_string (B_ARITH_REL_OP arop)
 {
   switch (arop) {
-    
+
   case B_ADD:
     return " + ";
 
@@ -2374,15 +2109,9 @@ char *b_arith_rel_op_string (B_ARITH_REL_OP arop)
   }
 }
 
-
-
-
-
-
 /* my_print_typetag is a version of ty_print_typetag (found
    in types.c) that sends its output to stdout instead of
    stderr.  */
-
 
 void my_print_typetag (TYPETAG tag)
     {
@@ -2474,4 +2203,3 @@ void my_print_typetag (TYPETAG tag)
 		}
 
     }
-

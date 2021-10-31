@@ -1,4 +1,3 @@
-
 /****************************************************************/
 /*								*/
 /*	CSCE531 - "Pascal" and "C" Compilers			*/
@@ -12,8 +11,6 @@
 /*								*/
 /****************************************************************/
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "message.h"
@@ -21,18 +18,14 @@
 /* Counter to keep track of the number of compiler errors */
 int compiler_errors = 0;
 
-
 /* Counter to keep track of the number of compiler warnings */
 int compiler_warnings = 0;
-
 
 /* Counter to keep track of the number of informal compiler messages */
 int compiler_messages = 0;
 
-
 /* error file pointer: assumed to be declared and initialized elsewhere */
 extern FILE *errfp;
-
 
 void msgn( char *format, ... )
 	/* writes a message passed in to specified file with
@@ -46,7 +39,6 @@ void msgn( char *format, ... )
 	va_end(ap);
 }
 
-
 void msg( char *format, ... )
 	/* writes a message passed in to specified file with
 		 newline.
@@ -59,7 +51,6 @@ void msg( char *format, ... )
 	compiler_messages++;
 	va_end(ap);
 }
-
 
 void message( char *format, ... )
 	/* writes a message passed in to specified file with
@@ -75,7 +66,6 @@ void message( char *format, ... )
 	va_end(ap);
 }
 
-
 static void vmessage( char *format, va_list ap )
 	/* writes a message passed in to specified file with
 		 line number and newline.  Assumes prestarted va_list
@@ -87,7 +77,6 @@ static void vmessage( char *format, va_list ap )
 	putc('\n',errfp);
 	compiler_messages++;
 }
-
 
 void warning ( char *format, ... )
 	/* this routine issues a formal warning to user including
@@ -104,7 +93,6 @@ void warning ( char *format, ... )
 	va_end(ap);
 }
 
-
 void error( char *format, ... )
 	/* this routine issues a compiler error in users source including
 	  message passed in to specified file.
@@ -120,7 +108,6 @@ void error( char *format, ... )
 	va_end(ap);
 }
 
-
 void fatal( char *format, ... )
 	/* this routine writes the message passed in to a specified
 	  file with the tag "fatal" meaning an internal data structure
@@ -134,7 +121,6 @@ void fatal( char *format, ... )
 	va_end(ap);
 	exit(1);
 }
-
 
 void bug( char *format, ... )
 	/* this routine writes the message passed in to a specified

@@ -19,7 +19,7 @@ Function get_integer : Integer; External;
 
 begin
 
-   i := 5;		
+   i := 5;
    j := i;
    k := 14;
    x := 3.14;

@@ -2,7 +2,6 @@
 
 (* There are no errors in this file. *)
 
-
 program T3L80_ok;
 
 var
@@ -12,7 +11,6 @@ var
    ca    : array[1..8] of Char;
    ia    : array[5..10] of Integer;
    ra    : array[7..9] of Real;
-
 
 procedure print_abc; External;
 procedure print_x; External;
@@ -30,7 +28,6 @@ procedure print_inner_inner; External;
 procedure print_looping; External;
 procedure print_looping_looping; External;
 procedure print_looping_looping_looping; External;
-
 
 begin
    a := 1;
@@ -83,7 +80,6 @@ begin
 
    print_grooviest;
 
-
    a := -1;
 
    while a > 3 do
@@ -109,7 +105,6 @@ begin
       a := a+1
    end;
 
-
    x := 9;
 
    while true do begin
@@ -120,7 +115,6 @@ begin
 
    if x <> 0 then
       x := 0;
-
 
    x := 3;
 

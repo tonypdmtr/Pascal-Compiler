@@ -3,18 +3,16 @@
 #include <assert.h>
 #include "tree.h"
 
-
-
 BOOLEAN isTagNumerical(TYPETAG t)
 {
-  switch (t) 
+  switch (t)
   {
     case TYSIGNEDLONGINT:
     case TYFLOAT:
     case TYDOUBLE:
       return TRUE;
   }
-  
+
   return FALSE;
 }
 
@@ -27,7 +25,7 @@ EXPR make_convert_expr(EXPR sub_expr, TYPE type)
   return expr;
 }
 void install_local_params(PARAM_LIST param)
-{  
+{
   ST_DR stdr;
   long low, high;
 
@@ -39,7 +37,7 @@ void install_local_params(PARAM_LIST param)
     stdr->u.decl.sc = param->sc;
     stdr->u.decl.is_ref = param->is_ref;
     stdr->u.decl.err = param->err;
-    
+
     //set offset (based on is_ref or type)
     if (param->is_ref == TRUE) {
       stdr->u.decl.v.offset = get_formal_param_offset(TYPTR);
@@ -64,7 +62,7 @@ EXPR check_assign(EXPR assign)
   TYPETAG left_tag, right_tag;
   left = assign->u.binop.left;
   right = assign->u.binop.right;
-  
+
   left_tag = ty_query(left->type);
   right_tag = ty_query(right->type);
   if (right_tag == TYERROR || left_tag == TYERROR) {
@@ -72,45 +70,44 @@ EXPR check_assign(EXPR assign)
   }
   if (left_tag == right_tag) {
     return assign;
-  } 
+  }
   if (left_tag == TYDOUBLE) {
 
     if (right_tag != TYFLOAT && right_tag != TYSIGNEDLONGINT) {
       printf("right is not float/int and left is double\n");
       error("Illegal conversion");
       return make_error_expr();
-    } 
+    }
     if (right_tag == TYFLOAT || right_tag == TYSIGNEDLONGINT) {
-      
-      if (assign->u.binop.right->tag == INTCONST) { 
+
+      if (assign->u.binop.right->tag == INTCONST) {
 	assign->u.binop.right = make_realconst_expr(assign->u.binop.right->u.intval);
-      } else { 
+      } else {
 	assign->u.binop.right = make_convert_expr(assign->u.binop.right, ty_build_basic(TYDOUBLE));
       }
     }
-    
+
     return assign;
-  } 
+  }
   if (left_tag == TYFLOAT) {
-    
-   
+
     if (right_tag != TYDOUBLE && right_tag != TYSIGNEDLONGINT) {
       printf("left is float, right is double/int\n");
       error("Illegal conversion");
       return make_error_expr();
-    } 
+    }
     assign->u.binop.right = make_convert_expr(assign->u.binop.right, ty_build_basic(TYFLOAT));
 
     return assign;
-  } 
+  }
   if (left_tag == TYUNSIGNEDCHAR && right->tag == STRCONST) {
- 
+
     if (strlen(right->u.strval) != 1) {
       printf("left is unsginedchar and right is strconst\n");
       error("Illegal conversion");
       return make_error_expr();
-    } 
-    
+    }
+
     assign->u.binop.right = make_intconst_expr(right->u.strval[0], ty_build_basic(TYSIGNEDLONGINT));
 
     return assign;
@@ -119,13 +116,12 @@ EXPR check_assign(EXPR assign)
   if (left_tag == TYARRAY || right_tag == TYARRAY) {
      return assign;
   }
- 
+
   printf("left_tag is %d\n",left_tag);
   printf("right_tag is %d\n",right_tag);
   error("Illegal conversion");
   return make_error_expr();
 }
-
 
 BOOLEAN isTagCharNum(TYPETAG t)
 {
@@ -137,27 +133,24 @@ BOOLEAN isTagCharNum(TYPETAG t)
     case TYSIGNEDCHAR:
       return TRUE;
   }
-  
+
   return FALSE;
 }
 
-
 EXPR castIntExpr(EXPR expr)
-{ 
+{
 
   if (expr->tag == INTCONST) {
     expr = make_realconst_expr(expr->u.intval);
   }
-  
- 
-  if (expr->tag == UNOP && expr->u.unop.op == CONVERT_OP && expr->u.unop.operand->tag == INTCONST) 
+
+  if (expr->tag == UNOP && expr->u.unop.op == CONVERT_OP && expr->u.unop.operand->tag == INTCONST)
    {
     expr = make_realconst_expr(expr->u.unop.operand->u.intval);
   }
 
   return expr;
 }
-
 
 /* This function creates a new type name data record and install it in the symbol table.
  * It take two parameters; the name of the type name as a char array, and a type object.
@@ -175,23 +168,21 @@ void create_typename(ST_ID id,TYPE new_type)
 
 	// Install the new data record in the symbol table
 	if (!st_install(id,new_data_rec)) {
-		// Issue an error message 
+		// Issue an error message
 		error("This Type name is already installed");
 	}
 
 }
 
-
-
 void create_gdecl(VAR_ID_LIST list,TYPE type)
 {
   VAR_ID_LIST node;
   TYPETAG tag;
-  
+
     ST_DR new_data_rec;
       BOOLEAN resolved;
   if (type == NULL) {
-    error("Variable(s) must be of data type"); 
+    error("Variable(s) must be of data type");
     return;
   }
 
@@ -226,7 +217,6 @@ void create_gdecl(VAR_ID_LIST list,TYPE type)
 		new_data_rec->u.decl.v.offset = 0;
 		new_data_rec->u.decl.err =FALSE;
 
-
 		// Install the new data record in the symbol table
 		if (!st_install(list->id,new_data_rec)) {
 			//writing an error message
@@ -240,17 +230,16 @@ void create_gdecl(VAR_ID_LIST list,TYPE type)
 	}
 }
 
-
 /* This function checks if an ST_ID is already installed in the symbol table as a typename typename,if the id was not installed an error is issued.
  * It take one parameter; an ST_ID.If the ID was NULL a bug is found.
  * As an output it returns a type object; if the error is issued then an error type is returned else the original type is returned.
  */
 TYPE check_typename(ST_ID id) {
-	
+
 	ST_DR chcktype;
 	int chck;
 
-     //if the id is null then bug is found 
+     //if the id is null then bug is found
 	if (id == NULL)
 		bug("null id passed to \"st_install\"");
 
@@ -260,11 +249,11 @@ TYPE check_typename(ST_ID id) {
 	}
 
 	return chcktype->u.typename.type;
-	
+
 }
 
 /* This function checks if the second index of the subrange is larger than the first, then it buids the subrange type.
- * It take two parameters; both an int representing the first and second indexes. 
+ * It take two parameters; both an int representing the first and second indexes.
  * As an output it returns a type object; if the error is issued then an error type is returned else the original type is returned.
  */
 /*TYPE check_subrange(long a, long b) {
@@ -290,17 +279,16 @@ TYPE check_function_type(TYPE type) {
 
 	if (ty_query(type) == TYFUNC) {
 		error("Function return type must be simple type");
-		return type; 
+		return type;
 	}
 
 	if (ty_query(type) == TYARRAY) {
 		error("Function return type must be simple type");
-		return type; 
+		return type;
 	}
 
 	return type;
 }
-
 
 /* This function checks an array to see if it's element type is valid.
  * It takes two parameters; a type object,and an INDEX_LIST index_list.If the type was not in the symbol table then an
@@ -319,7 +307,6 @@ TYPE check_array(TYPE type, INDEX_LIST i) {
 		return ty_build_basic(TYERROR);
 	}
 
-
 	return ty_build_array(type, i);
 }
 
@@ -333,16 +320,16 @@ VAR_ID_LIST build_var_id_list (VAR_ID_LIST list,ST_ID id)
 
   id_list->id = id;
   id_list->next = NULL;
- //checking if the list is empty 
+ //checking if the list is empty
   if (list!=NULL)
   {
-       // pushing the list to the back of new id 
+       // pushing the list to the back of new id
         id_list->next=list;
 
   }
- 
+
   return id_list;
-  
+
 }
 
 PARAM_LIST build_param_list(VAR_ID_LIST id_list,TYPE type,BOOLEAN value)
@@ -363,10 +350,10 @@ PARAM_LIST build_param_list(VAR_ID_LIST id_list,TYPE type,BOOLEAN value)
            new->is_ref = value;
 	   new->prev = NULL;
 	   new->next = NULL;
-       
+
            new->next=head;
            head=new;
-            //moving id_ptr to the next node 
+            //moving id_ptr to the next node
             id_ptr = id_ptr->next;
 	}
 
@@ -374,17 +361,16 @@ PARAM_LIST build_param_list(VAR_ID_LIST id_list,TYPE type,BOOLEAN value)
 
 }
 
-PARAM_LIST check_param(PARAM_LIST p) 
+PARAM_LIST check_param(PARAM_LIST p)
 {
-	
+
 	if (!p) bug("%s:%d check_params received a NULL pointer\n", __FILE__, __LINE__);
 	if (!p->id) bug("%s:%d check_params received a pointer to NULL id\n", __FILE__, __LINE__);
 
-	
 	if (ty_query(p->type) == TYARRAY || ty_query(p->type) == TYFUNC) {
 		error("Parameter type must be a simple type");
 	}
-	
+
 	PARAM_LIST c = p->next;
 	while (c) {
 		if (!strcmp(st_get_id_str(p->id), st_get_id_str(c->id))) {
@@ -396,7 +382,7 @@ PARAM_LIST check_param(PARAM_LIST p)
 		}
 		c = c->next;
 	}
-	
+
 	return p;
 }
 
@@ -407,10 +393,9 @@ PARAM_LIST check_param(PARAM_LIST p)
 
 PARAM_LIST concatenate_param_list (PARAM_LIST list1,PARAM_LIST list2)
 {
-	if (!list1 && !list2) return NULL;	
-	if (!list1) return list2;		
-	if (!list2) return list1;		
-
+	if (!list1 && !list2) return NULL;
+	if (!list1) return list2;
+	if (!list2) return list1;
 
 	PARAM_LIST new_list;
 	new_list=list1;
@@ -430,10 +415,10 @@ PARAM_LIST concatenate_param_list (PARAM_LIST list1,PARAM_LIST list2)
 INDEX_LIST concatenate_index_lists (INDEX_LIST list1,TYPE type)
 {
 	INDEX_LIST ptr, list2;
-	
+
 	list2 = (INDEX_LIST) malloc(sizeof(INDEX));
 	list2 = create_list_from_type(type);
-	
+
 	ptr=list1;
 	while (ptr->next)
 	{
@@ -458,7 +443,6 @@ INDEX_LIST create_list_from_type(TYPE type)
 	index->prev=NULL;
 	return index;
 }
-
 
 /* This function traverse the linked list of unresolved pointers and resolves them..
  * It takes no parameter and returns nothing.
@@ -487,7 +471,7 @@ void resolve_all_ptr()
 		{
 			if(!ty_resolve_ptr(unresolved, data_rec->u.typename.type))
 				error("Unresolved type name: \"%s\"", st_get_id_str(id));
-		}	
+		}
 		else
 		{
 			error("Unidentified type tag\n");
@@ -533,7 +517,7 @@ EXPR_LIST expr_list_reverse(EXPR_LIST list) {
       prev = list;
       list = tmp;
    }
- 
+
    return prev;
 }
 
@@ -553,7 +537,7 @@ int process_var_decl(VAR_ID_LIST ids, TYPE type, int cur_offset) {
    if (tag == TYFUNC) {
       error("Variable(s) must be of data type");
    }
-   
+
    if (st_get_cur_block() >= 1) { //global variables
       create_gdecl(ids, type);
       decl(type,ids);
@@ -581,7 +565,7 @@ int process_var_decl(VAR_ID_LIST ids, TYPE type, int cur_offset) {
             if (!st_install(ids->id, data_rec)) {
                error("Duplicate variable declaration: \"%s\"", st_get_id_str(ids->id));
                free(data_rec);
-            } 
+            }
 
             ids = ids->next;
          }
@@ -592,7 +576,7 @@ int process_var_decl(VAR_ID_LIST ids, TYPE type, int cur_offset) {
 
 /************************************************************************
  * Checks that both lo and hi are INTCONSTS of the same type, also      *
- * checks that the second index is larger than the first                * 
+ * checks that the second index is larger than the first                *
  * Previous check_subrange function took in long parameters             *
  *                                                                      *
  * Return: new subrange type                                            *
@@ -613,7 +597,7 @@ TYPE check_subrange(EXPR lo, EXPR hi) {
    if (low < high) {
       return ty_build_subrange(ty_build_basic(TYSIGNEDLONGINT), low, high);
    }
-   
+
    error("Empty subrange in array index");
    error("Illegal index type (ignored)");
 
@@ -646,7 +630,7 @@ void build_func_decl(ST_ID id, TYPE type, DIRECTIVE dir) {
    else if (dir == DIR_FORWARD) {
       //type is not altered
       data_rec->u.decl.sc = NO_SC;
-      data_rec->u.decl.type = type; 
+      data_rec->u.decl.type = type;
    }
    else {
       //othewise an invalid directive
@@ -695,19 +679,19 @@ int enter_function(ST_ID id, TYPE type, char *global_func_name)
     st_install(id, stdr);
   }
  else
- { 
-    
+ {
+
     if(stdr->tag != GDECL || stdr->u.decl.sc != NO_SC) {
       error("Duplicate function declaration");
       return;
-    } 
-    
+    }
+
     type2 = ty_query_func(stdr->u.decl.type, &param2, &c_args2);
     if (ty_test_equality(type1, type2) != TRUE) {
       error("Incorrect return type");
       return;
-    } 
-    
+    }
+
     stdr->tag = FDECL;
     stdr->u.decl.v.global_func_name = global_func_name;
   }
@@ -749,9 +733,6 @@ EXPR make_intconst_expr(long val, TYPE type) {
    return ret;
 }
 
-
-
-
 /************************************************************************
  * Creates a new REALCONST node with TYDOUBLE type and given value      *
  *                                                                      *
@@ -768,7 +749,6 @@ EXPR make_realconst_expr(double val) {
    return ret;
 }
 
-
 EXPR tryFoldExpr(EXPR expr)
 {
   EXPR_BINOP op;
@@ -781,161 +761,161 @@ EXPR tryFoldExpr(EXPR expr)
   switch(op)
    {
     case ASSIGN_OP:    break;
-    case ADD_OP: 
-    case SUB_OP: 
-    case MUL_OP: 
+    case ADD_OP:
+    case SUB_OP:
+    case MUL_OP:
     case DIV_OP:
-    case MOD_OP: 
-    case REALDIV_OP: 
-    	  if((expr->u.binop.left->tag == INTCONST || expr->u.binop.left->tag == REALCONST) && (expr->u.binop.right->tag == INTCONST || expr->u.binop.right->tag == REALCONST)) 
+    case MOD_OP:
+    case REALDIV_OP:
+    	  if((expr->u.binop.left->tag == INTCONST || expr->u.binop.left->tag == REALCONST) && (expr->u.binop.right->tag == INTCONST || expr->u.binop.right->tag == REALCONST))
    	      {
-		    if(tag == TYDOUBLE || tag == TYFLOAT) 
-		      { 
-			  if(expr->u.binop.left->tag == REALCONST) 
+		    if(tag == TYDOUBLE || tag == TYFLOAT)
+		      {
+			  if(expr->u.binop.left->tag == REALCONST)
 			      {
 				    real_val = expr->u.binop.left->u.realval;
 	 		      }
-			 else 
+			 else
 			      {
 	   			    real_val = expr->u.binop.left->u.intval;
 	  		      }
-	            if(expr->u.binop.right->tag == REALCONST) 
+	            if(expr->u.binop.right->tag == REALCONST)
 		      {
 	 		   if(op==ADD_OP)
 			      {
 	                         real_val += expr->u.binop.right->u.realval;
-	                       } 
-			   else if(op==SUB_OP) 
+	                       }
+			   else if(op==SUB_OP)
                                {
 				 real_val -= expr->u.binop.right->u.realval;
-	   		      } 
+	   		      }
 			   else if(op==MUL_OP)
-                              { 
+                              {
 	                         real_val *= expr->u.binop.right->u.realval;
-	                      } 
-                           else if(op==DIV_OP) 
-                              { 
+	                      }
+                           else if(op==DIV_OP)
+                              {
 	                          real_val /= expr->u.binop.right->u.realval;
                        	    }
-	              } 
-                     else 
+	              }
+                     else
                       {
 	                     if (op==ADD_OP)
-                                 { 
+                                 {
 	                             real_val += expr->u.binop.right->u.intval;
 	                         }
-                           else if(op==SUB_OP) 
-				{ 
+                           else if(op==SUB_OP)
+				{
 	                             real_val -= expr->u.binop.right->u.intval;
-	                       } 
-			   else if(op==MUL_OP) 
-                               { 
+	                       }
+			   else if(op==MUL_OP)
+                               {
 			            real_val *= expr->u.binop.right->u.intval;
-			       } 
+			       }
                          else if(op==DIV_OP)
-                             { 
+                             {
 		                   real_val /= expr->u.binop.right->u.intval;
 	                      }
 	                }
-	 
+
 	          expr = make_realconst_expr(real_val);
-	      } 
-           else 
-   	    { 
+	      }
+           else
+   	    {
 		  int_val=expr->u.binop.left->u.intval;
 
 		  if(op==ADD_OP)
-		   { 
+		   {
 		  	  int_val += expr->u.binop.right->u.intval;
 
-		  } 
+		  }
                  else if(op==SUB_OP)
-                   { 
+                   {
 		    int_val-=expr->u.binop.right->u.intval;
-		  } 
-                 else if(op==MUL_OP) 
-                   { 
+		  }
+                 else if(op==MUL_OP)
+                   {
 		        int_val *= expr->u.binop.right->u.intval;
-		  } 
+		  }
                  else if(op==DIV_OP)
-                  { 
+                  {
 		    int_val/=expr->u.binop.right->u.intval;
-		  } 
+		  }
                  else if (op == MOD_OP)
-                  { 
+                  {
 		    int_val%=expr->u.binop.left->u.intval;
 		  }
                  else if(op==REALDIV_OP)
                    {
 		    int_val/=expr->u.binop.left->u.intval;
 		  }
-	  
+
 	  //creating the folded expression
 	  expr=make_intconst_expr(int_val,ty_build_basic(TYSIGNEDLONGINT));
 	}
       }
-      break; 
-    case EQ_OP: 
+      break;
+    case EQ_OP:
     case LESS_OP:
-    case LE_OP: 
+    case LE_OP:
     case NE_OP:
-    case GE_OP: 
-    case GREATER_OP: 
-      if (expr->u.binop.left->tag == INTCONST && expr->u.binop.right->tag == INTCONST) 
+    case GE_OP:
+    case GREATER_OP:
+      if (expr->u.binop.left->tag == INTCONST && expr->u.binop.right->tag == INTCONST)
         {
 	   if(op==EQ_OP)
-             { 
+             {
 		  int_val = expr->u.binop.left->u.intval == expr->u.binop.left->u.intval;
-	     } 
-           else if(op==LESS_OP) 
-	     { 
+	     }
+           else if(op==LESS_OP)
+	     {
 	  	int_val = expr->u.binop.left->u.intval < expr->u.binop.left->u.intval;
-	     } 
-          else if(op==LE_OP) 
+	     }
+          else if(op==LE_OP)
             {
 	       int_val = expr->u.binop.left->u.intval <= expr->u.binop.left->u.intval;
-	     } 
-          else if(op==NE_OP) 
-	    { 
+	     }
+          else if(op==NE_OP)
+	    {
 	       int_val = expr->u.binop.left->u.intval != expr->u.binop.left->u.intval;
 	    }
-          else if(op==GE_OP) 
+          else if(op==GE_OP)
             {
 	       int_val = expr->u.binop.left->u.intval >= expr->u.binop.left->u.intval;
-	    } 
-          else if(op==GREATER_OP) 
+	    }
+          else if(op==GREATER_OP)
 	    {
 	        int_val = expr->u.binop.left->u.intval > expr->u.binop.left->u.intval;
 	    }
 
 	expr = make_intconst_expr(int_val, ty_build_basic(TYSIGNEDLONGINT));
 	expr = make_convert_expr(expr, ty_build_basic(TYSIGNEDCHAR));
-	
-      } 
-     else if(expr->u.binop.left->tag==STRCONST&&expr->u.binop.right->tag==STRCONST && strlen(expr->u.binop.left->u.strval) == 1 && strlen(expr->u.binop.right->u.strval) == 1) 
+
+      }
+     else if(expr->u.binop.left->tag==STRCONST&&expr->u.binop.right->tag==STRCONST && strlen(expr->u.binop.left->u.strval) == 1 && strlen(expr->u.binop.right->u.strval) == 1)
         {
-	    if(op==EQ_OP) 
-      	       { 
+	    if(op==EQ_OP)
+      	       {
 	         int_val = expr->u.binop.left->u.strval[0] == expr->u.binop.left->u.strval[0];
-	      } 
-            else if(op==LESS_OP) 
-              { 
+	      }
+            else if(op==LESS_OP)
+              {
 	         int_val = expr->u.binop.left->u.strval[0] < expr->u.binop.left->u.strval[0];
-	     } 
-           else if(op==LE_OP) 
-             { 
+	     }
+           else if(op==LE_OP)
+             {
 	         int_val=expr->u.binop.left->u.strval[0] <= expr->u.binop.left->u.strval[0];
-	      } 
-           else if(op == NE_OP) 
+	      }
+           else if(op == NE_OP)
              {
 	          int_val = expr->u.binop.left->u.strval[0] != expr->u.binop.left->u.strval[0];
 	     }
-           else if (op == GE_OP) 
-             { 
+           else if (op == GE_OP)
+             {
 	           int_val = expr->u.binop.left->u.strval[0] >= expr->u.binop.left->u.strval[0];
-	     } 
-           else if (op == GREATER_OP) 
-             { 
+	     }
+           else if (op == GREATER_OP)
+             {
 	          int_val = expr->u.binop.left->u.strval[0] > expr->u.binop.left->u.strval[0];
 	     }
 	expr = make_intconst_expr(int_val, ty_build_basic(TYSIGNEDLONGINT));
@@ -960,7 +940,7 @@ EXPR make_strconst_expr(char *str) {
    ret->type = ty_build_ptr(NULL, ty_build_basic(TYUNSIGNEDCHAR));
    ret->u.strval = str;
    return ret;
-}  
+}
 
 /************************************************************************
  * Creates a new NULLOP node with given op and TYPE depends on op       *
@@ -1045,9 +1025,9 @@ EXPR make_fcall_expr(EXPR func, EXPR_LIST args) {
 
    //check check_args flag
    ret_type = ty_query_func(func->type, &param, &check);
-   
+
    if (!check) { //likely an external function
-      //make all arguments r-values and unary-convert         
+      //make all arguments r-values and unary-convert
       while (aCopy != NULL) {
          if (is_lval(aCopy->expr)) { //create a deref node
             EXPR derefNode = make_un_expr(DEREF_OP, aCopy->expr);
@@ -1066,14 +1046,14 @@ EXPR make_fcall_expr(EXPR func, EXPR_LIST args) {
             convertedNode->type = ty_build_basic(TYDOUBLE);
             aCopy->expr = convertedNode;//expr now points to convert node
          }
-         
+
          aCopy = aCopy->next;
       }
    }
    else { //check_args is true
       while (aCopy != NULL && param != NULL) {
          if (param->is_ref == TRUE) { //VAR parameter
-            //actual arg must be an l-value whose type 
+            //actual arg must be an l-value whose type
             //matches the type of the formal param
             if(ty_test_equality(aCopy->expr->type, param->type) == FALSE) {
                error("types not equal");
@@ -1086,7 +1066,7 @@ EXPR make_fcall_expr(EXPR func, EXPR_LIST args) {
                EXPR derefNode = make_un_expr(DEREF_OP, aCopy->expr);
                aCopy->expr = derefNode; //expr now points to convert node
             }
-      
+
             //perfrom conversions
             expr_type = ty_query(aCopy->expr->type);
             if (expr_type == TYSIGNEDCHAR || expr_type == TYUNSIGNEDCHAR) {
@@ -1121,7 +1101,6 @@ EXPR make_fcall_expr(EXPR func, EXPR_LIST args) {
    return ret;
 }
 
-
 /************************************************************************
  * Function to install parameters, used in enter_function()             *
  * local function                                                       *
@@ -1140,7 +1119,7 @@ void install_params(PARAM_LIST list) {
       data_rec->u.decl.sc = list->sc;
       data_rec->u.decl.is_ref = list->is_ref;
       data_rec->u.decl.err = list->err;
-      
+
       if (ty_query(list->type) == TYSUBRANGE) {
          data_rec->u.decl.type = ty_query_subrange(list->type, &low, &high);
       }
@@ -1179,7 +1158,7 @@ void install_params(PARAM_LIST list) {
 		error("This is a typename");
 		return NULL;
 	}
- 	 	
+
 	switch(tag)
 	{
 	case TYPENAME:
@@ -1235,8 +1214,8 @@ EXPR make_id_expr(ST_ID id) {
    if (data_rec == NULL) {
       error("Undeclared identifier \"%s\" in expression", st_get_id_str(id));
       return make_error_expr();
-   } 
-   
+   }
+
    if (data_rec->tag == TYPENAME) {
       error("Identifier \"%s\" installed as TYPENAME", st_get_id_str(id));
       return make_error_expr();
@@ -1267,13 +1246,13 @@ EXPR make_id_expr(ST_ID id) {
             ret->u.lfun.link_count = st_get_cur_block() - block;
          }
          break;
-       
+
       default:
          break;
    }
    return ret;
 }
-   
+
 /* gram: standard_procedure_statement (9th production), signed_primary (2nd production), signed_factor (2nd production), factor (5th and 6th productions -- optional), variable_or_function_access_no_id (5th and 8th productions), standard_functions (1st, 2nd (optional), and 3rd production (if only one parameter))
    Returns a new UNOP node based on the op and the sub(expression):
    1. If op expects an r-value and sub is an l-value, then a DEREF node is
@@ -1298,13 +1277,11 @@ EXPR make_id_expr(ST_ID id) {
 
 EXPR make_un_expr(EXPR_UNOP op, EXPR sub){
 
-
 	BOOLEAN lval;
 	BOOLEAN deref;
 	EXPR ret;
 	ret = (EXPR)malloc(sizeof(EXPR_NODE));
-	
-	
+
 	lval = is_lval(sub);
 	if(lval){
 		if(op<>ADDRESS_OP || op<>NEW_OP)
@@ -1356,7 +1333,6 @@ EXPR make_un_expr(EXPR_UNOP op, EXPR sub){
 		case DISPOSE_OP:
         case SET_RETURN_OP:
 
-		
 	return ret;
 }//end make_un_expr*/
 
@@ -1379,7 +1355,7 @@ EXPR make_un_expr(EXPR_UNOP op, EXPR sub) {
    TYPETAG sub_tag = ty_query(sub->type);
    ST_ID id;
    TYPE base_type,next;
-   long low, high; 
+   long low, high;
 
    //there was an infinite loop when creating a DEREF node
    if (op == DEREF_OP) {
@@ -1444,7 +1420,7 @@ EXPR make_un_expr(EXPR_UNOP op, EXPR sub) {
             error("Incorrect type in CHR_OP");
             return make_error_expr();
          }
-   
+
          //returns char so updated type
          ret->type = ty_build_basic(TYUNSIGNEDCHAR);
          break;
@@ -1467,7 +1443,7 @@ EXPR make_un_expr(EXPR_UNOP op, EXPR sub) {
             error("Incorrect type in UPLUS_OP");
             return make_error_expr();
          }
-         break; 
+         break;
       case INDIR_OP:
          //returns a pointer, not sure if any other errors/checks
          ret->type = ty_query_ptr(sub->type, &id, &next);
@@ -1476,7 +1452,6 @@ EXPR make_un_expr(EXPR_UNOP op, EXPR sub) {
    }
    return ret;
 }
-
 
 /* gram: expression (1st production), simple_expression (2nd production; 3rd, 4th, and 5th productions are optional), term (2nd production; 3rd is optional), standard_functions (3rd production -- if 2 arguments (optional))
    Returns a new BINOP node based on the op and the two subexpressions:
@@ -1504,17 +1479,16 @@ EXPR make_un_expr(EXPR_UNOP op, EXPR sub) {
  * Return: the new node                                                 *
  ************************************************************************/
 
-
-EXPR make_bin_expr(EXPR_BINOP op, EXPR left, EXPR right)  
+EXPR make_bin_expr(EXPR_BINOP op, EXPR left, EXPR right)
 {
   EXPR ret;
   TYPE next;
   long low, high;
-  
+
   if(left->tag == ERROR || right->tag == ERROR) {
     return make_error_expr();
-  } 
-  
+  }
+
   ret = malloc(sizeof(EXPR_NODE));
   ret->tag = BINOP;
   ret->type = right->type;
@@ -1530,52 +1504,52 @@ EXPR make_bin_expr(EXPR_BINOP op, EXPR left, EXPR right)
   TYPETAG left_type = ty_query(left->type);
   TYPETAG right_type = ty_query(right->type);
 
-  if(op==ASSIGN_OP) 
+  if(op==ASSIGN_OP)
    {
-    
+
     if(is_lval(left) != TRUE)
      {
       error("Assignment requires l-value on the left");
-      return make_error_expr();	
-    } 
-    if(is_lval(right)) 
-     {
-      right = ret->u.binop.right = make_un_expr(DEREF_OP, right); 
+      return make_error_expr();
     }
-    if(right_type == TYVOID)  
+    if(is_lval(right))
+     {
+      right = ret->u.binop.right = make_un_expr(DEREF_OP, right);
+    }
+    if(right_type == TYVOID)
      {
       error("Cannot convert between nondata types");
       return make_error_expr();
-    } 
-    if(right_type == TYFLOAT) 
+    }
+    if(right_type == TYFLOAT)
      {
       ret->u.binop.right = make_convert_expr(right, ty_build_basic(TYDOUBLE));
     }
-   else if(right_type == TYSUBRANGE) 
-    { 
+   else if(right_type == TYSUBRANGE)
+    {
       next = ty_query_subrange(right->type, &low, &high);
       ret->u.binop.right = make_convert_expr(right, next);
     }
     return check_assign(ret);
   }
 
-  if (is_lval(left)) 
-  { 
+  if (is_lval(left))
+  {
     ret->u.binop.left = make_un_expr(DEREF_OP, left);
   }
   if (is_lval(right))
-  { 
+  {
     ret->u.binop.right = make_un_expr(DEREF_OP, right);
   }
 
-  if(left_type==TYFLOAT || left_type==TYSUBRANGE) 
+  if(left_type==TYFLOAT || left_type==TYSUBRANGE)
    {
-    
+
     if (left_type == TYFLOAT)
-    { 
+    {
       ret->u.binop.left = make_convert_expr(left, ty_build_basic(TYDOUBLE));
-    } 
-   else 
+    }
+   else
      {
       next = ty_query_subrange(left->type, &low, &high);
       ret->u.binop.left = make_convert_expr(left, next);
@@ -1584,13 +1558,13 @@ EXPR make_bin_expr(EXPR_BINOP op, EXPR left, EXPR right)
   }
 
   if (left_type == TYFLOAT || right_type == TYSUBRANGE) {
-    
+
     if (right_type == TYFLOAT)
     {
       ret->u.binop.right = make_convert_expr(right, ty_build_basic(TYDOUBLE));
-    } 
+    }
   else
-   { 
+   {
       next = ty_query_subrange(right->type, &low, &high);
       ret->u.binop.right = make_convert_expr(right, next);
     }
@@ -1599,7 +1573,7 @@ EXPR make_bin_expr(EXPR_BINOP op, EXPR left, EXPR right)
   }
 
   if (left_type == TYDOUBLE || right_type == TYDOUBLE)
-   { 
+   {
     if (left_type == TYSIGNEDLONGINT) {
       ret->u.binop.left = make_convert_expr(ret->u.binop.left, ty_build_basic(TYDOUBLE));
 
@@ -1611,8 +1585,8 @@ EXPR make_bin_expr(EXPR_BINOP op, EXPR left, EXPR right)
       right_type = ty_query(ret->u.binop.right->type);
     }
   }
-  
-  switch (op) 
+
+  switch (op)
     {
     case ASSIGN_OP:
       break;
@@ -1623,8 +1597,8 @@ EXPR make_bin_expr(EXPR_BINOP op, EXPR left, EXPR right)
       if (isTagNumerical(right_type) == FALSE || isTagNumerical(left_type) == FALSE) {
       	error("Nonnumerical type argument(s) to arithmetic operation");
 	return make_error_expr();
-      } 
-      
+      }
+
       if (left_type == TYDOUBLE || right_type == TYDOUBLE) {
 
 	if (left_type == TYSIGNEDLONGINT) {
@@ -1634,21 +1608,21 @@ EXPR make_bin_expr(EXPR_BINOP op, EXPR left, EXPR right)
 	if (right_type == TYSIGNEDLONGINT) {
 	  ret->u.binop.right = castIntExpr(ret->u.binop.right);
 	}
-	
+
 	ret->type = ty_build_basic(TYDOUBLE);
-      } else { 
+      } else {
 	ret->type = ty_build_basic(TYSIGNEDLONGINT);
       }
       break;
 
     case MOD_OP:
-    case REALDIV_OP: 
+    case REALDIV_OP:
 
       if (right_type != TYSIGNEDLONGINT || left_type != TYSIGNEDLONGINT) {
 	error("Noninteger type argument(s) to integer arithmetic operation");
 	return make_error_expr();
-      } 
-      
+      }
+
       ret->type = ty_build_basic(TYSIGNEDLONGINT);
       break;
 
@@ -1680,9 +1654,6 @@ EXPR make_bin_expr(EXPR_BINOP op, EXPR left, EXPR right)
   return ret;
 }
 
-
-
-
 /* gram: assignment_or_call_statement
    If lhs is a simple identifier, then id is the corresponding ST_ID.
    Case 1 -- rhs is non-NULL: Then this is probably an assignment statement --
@@ -1704,10 +1675,8 @@ EXPR make_bin_expr(EXPR_BINOP op, EXPR left, EXPR right)
       c) Any other tag is an error.
 */
 
-
 EXPR check_assign_or_proc_call(EXPR lhs, ST_ID id, EXPR rhs) {
 
-   
    PARAM_LIST params;
    BOOLEAN check;
 
@@ -1732,7 +1701,7 @@ EXPR check_assign_or_proc_call(EXPR lhs, ST_ID id, EXPR rhs) {
          return ret;
       }
    }
-   
+
    //case2, rhs is NULL
    else {
       if (lhs->tag == UNOP) {
@@ -1741,7 +1710,6 @@ EXPR check_assign_or_proc_call(EXPR lhs, ST_ID id, EXPR rhs) {
          }
       }
 
-   
       if (lhs->tag == GID || lhs->tag == LFUN) {
          //check that lhs is a pascal procedure
          if (ty_query(lhs->type) == TYFUNC) {
@@ -1750,11 +1718,11 @@ EXPR check_assign_or_proc_call(EXPR lhs, ST_ID id, EXPR rhs) {
          }
          else {
             error("Expected procedure name, saw data");
-            return make_error_expr();      
+            return make_error_expr();
          }
       }
       else if (lhs->tag == FCALL) {
-            
+
          //check the return type is void
          if (ty_query(lhs->type) == TYVOID) {
             return lhs;
@@ -1770,31 +1738,31 @@ EXPR check_assign_or_proc_call(EXPR lhs, ST_ID id, EXPR rhs) {
                return make_error_expr();
         }
       else
-      { 
+      {
          error("Procedure call expected");
          return make_error_expr();
       }
    }
-}  
-   	
+}
+
 /* Deallocates an expression tree.  Subexpressions and other subobjects
-   are deallocated recursively, postorder. 
+   are deallocated recursively, postorder.
 void expr_free(EXPR expr){
 
 		if (expr != NULL){
 			expr_free(expr);
 			free(expr);
 		}
-	
+
 }//end expr_free*/
 
 /*void expr_list_free(EXPR_LIST list){
-	
+
 	if (list != NULL){
 		expr_list_free(list);
 		free(list);
 	}
-	
+
 }//end expr_list_free */
 
 /************************************************************************
@@ -1829,7 +1797,7 @@ void expr_free(EXPR expr) {
    else {
       free(expr);
    }
-}    
+}
 
 /************************************************************************
  * Deallocates a list of expressions                                    *
@@ -1847,7 +1815,7 @@ unsigned long get_value_range(TYPE type, long *low) {
 }
 
 /************************************************************************
- * Creates a new ARRAY_ACCESS expr with the given array and indices     *     
+ * Creates a new ARRAY_ACCESS expr with the given array and indices     *
  * Function will also:                                                  *
  *     check that the array is of array type (else returns an error)    *
  *     gets the r-val of each index expression and unary converts       *
@@ -1888,7 +1856,7 @@ EXPR make_array_access_expr(EXPR array, EXPR_LIST indices) {
          indices->expr = convertedNode;
          array_type = indices->expr->type;
       }
-      
+
       //checks type with "formal" type
       if (ty_query(indices->expr->type) != TYSIGNEDLONGINT) {
          error("Incompatible index type in array access");
@@ -1898,7 +1866,7 @@ EXPR make_array_access_expr(EXPR array, EXPR_LIST indices) {
       i = i->next;
       indices = indices->next;
    }
-  
+
    //checks that both indices are same lenght
    if ((indices == NULL && i != NULL) || (indices != NULL && i == NULL)) {
       error("indices not equal");
@@ -1913,7 +1881,7 @@ EXPR make_array_access_expr(EXPR array, EXPR_LIST indices) {
    ret->type = array_type;
    ret->u.fcall_or_array_access.args_or_indices = indices;
    ret->u.fcall_or_array_access.function_or_array = array;
-   
+
 }
 
 /************************************************************************
@@ -1955,7 +1923,7 @@ BOOLEAN check_case_values(TYPETAG type, VAL_LIST vals, VAL_LIST prev_vals) {
       }
       //check for overlap
    }
-   return TRUE;   
+   return TRUE;
 }
 
 /************************************************************************

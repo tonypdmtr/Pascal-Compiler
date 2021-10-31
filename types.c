@@ -64,7 +64,7 @@ typedef struct type_rec
 	    struct type_rec *base_type;
 	    long low, high;
 	} subrange;
-    } u;	
+    } u;
 } TYPE_REC;
 
 static void print_type();
@@ -208,11 +208,10 @@ TYPE ty_build_basic(TYPETAG tag)
     case TYERROR :		/* Added 11/13/91 -SF */
 	return &basic_error;
 
-    default: 
+    default:
 	bug("illegal tag in \"ty_build_basic\" \n");
     }
 }
-
 
 /*****************************************************************/
 TYPE ty_build_ptr(ST_ID id, TYPE object)
@@ -333,7 +332,6 @@ TYPE ty_query_func(TYPE_REC * type, PARAM_LIST * params, BOOLEAN * check_args)
     *check_args = type->u.function.check_args;
     return type->u.function.object;
 }
-
 
 /****************************************************************/
 MEMBER_LIST ty_retrieve_members(TYPE_REC * type)
@@ -462,7 +460,6 @@ void ty_delete(TYPE_REC * type)
 {
     /* not implemented */
 }
-
 
 /********************************************************************/
 /*
@@ -613,7 +610,7 @@ void ty_print_class(STORAGE_CLASS tag)
 	break;
     default:
 	bug("illegal storage class in \"ty_print_class\"");
-	     
+
     }
 }
 
@@ -695,8 +692,6 @@ void ty_print_indexlist(INDEX_LIST indices)
 /*								*/
 /*								*/
 /****************************************************************/
-
-
 
 /********************************************************************/
 void print_type(TYPE_REC * typein, BOOLEAN recurse_flag,
@@ -851,7 +846,6 @@ void print_type(TYPE_REC * typein, BOOLEAN recurse_flag,
 
 }
 
-
 /**************************************************************/
 static BOOLEAN test_equality(TYPE_REC * type1, TYPE_REC * type2, int ptr_cnt)
     /*
@@ -964,7 +958,7 @@ static BOOLEAN test_equality(TYPE_REC * type1, TYPE_REC * type2, int ptr_cnt)
 	}
 	/* Return TRUE iff both parameter list pointers are NULL. */
 	return pl1 == pl2;
-	
+
 	/* The rest of the tags are for basic types, and these tags
 	   determine their types completely. */
     default:
@@ -973,4 +967,3 @@ static BOOLEAN test_equality(TYPE_REC * type1, TYPE_REC * type2, int ptr_cnt)
 
     bug("How did I get here?");
 }
-	    

@@ -18,9 +18,7 @@
 #include "symtab.h"
 #include "message.h"
 
-
 #define HT_LENGTH	997	/* hash table length */
-
 
 /* If L_warn_shadow is TRUE, st_install() checks for shadowed variables */
 static int L_warn_shadow = FALSE;
@@ -38,9 +36,8 @@ typedef struct  bucket_rec
 {
     char *id;    		/* pointer to id string in string area */
     struct stack_rec *sr_top;   /* pointer to var stack */
-    struct bucket_rec *next_br; /* pointer to next bucket */	
+    struct bucket_rec *next_br; /* pointer to next bucket */
 } ST_BUCKET_REC;
-
 
 static int st_hash(char *);
 static STACK_REC *alloc_stack_rec(void);
@@ -48,7 +45,6 @@ static char *alloc_str(int n);
 static ST_BUCKET_REC *alloc_hash_rec(void);
 static int st_hash(char *);
 
-		
 typedef STACK_REC  *BLOCK_ST;
 typedef ST_BUCKET_REC *HASHTAB_REC_PTR;
 
@@ -57,7 +53,7 @@ typedef ST_BUCKET_REC *HASHTAB_REC_PTR;
 /***********************************************************************/
 
 static HASHTAB_REC_PTR hash_table[HT_LENGTH];
-static BLOCK_ST block_stack[BS_DEPTH];    /* pointer to each block */ 
+static BLOCK_ST block_stack[BS_DEPTH];    /* pointer to each block */
 static int  cur_block = 0;   		  /* counter for current block level */
 static user_func dump_func = NULL;	  /* free var stack data records */
 static user_func free_func = NULL;	  /* free var stack data records */
@@ -94,7 +90,7 @@ static struct {
 **  Function: st_establish_data_dump_func
 **
 **  Purpose: copy f,user defined function,into static global variable dump_func
-   	     used in st_dump and st_dump_block 
+   	     used in st_dump and st_dump_block
 **
 **  Notes:
 */
@@ -105,14 +101,12 @@ void st_establish_data_dump_func (user_func f)
     dump_func = f;
 }
 
-
-
 /*****************************************************************************/
 /*
 **  Function: st_establish_data_free_func
 **
 **  Purpose: copy f,user defined function, into static global variable free_func
-used in st_exit_blcok 
+used in st_exit_blcok
 **
 **  Notes:
 */
@@ -127,7 +121,7 @@ void st_establish_data_free_func(user_func f)
 /*
 **  Function: st_enter_block
 **
-**  Purpose: routine to open new block 
+**  Purpose: routine to open new block
 **
 **  Notes:
 */
@@ -152,7 +146,7 @@ void st_enter_block(void)
 **  Purpose: routine to enter id into symbol table
 return : pointer to ST_ID in format of bucket record
 look to see if already there and return it
-else allocate space and store string in string area 
+else allocate space and store string in string area
 **
 **  Notes:
 */
@@ -181,7 +175,7 @@ ST_ID st_enter_id(char *id)
     }
 
     if ((new_br = alloc_hash_rec()) == NULL) /*not found so enter */
-	fatal("Unable to allocate hash bucket space.\n "); 
+	fatal("Unable to allocate hash bucket space.\n ");
     else
     {
 	/*  will store id-string in string pool area */
@@ -204,21 +198,21 @@ ST_ID st_enter_id(char *id)
 **
 **  Purpose: routine to free up stack records in exiting block
 return space to free stack, call user defined function
-to free data record space, and reset global variable cur_block 
+to free data record space, and reset global variable cur_block
 **
 **  Notes:
 */
 
 void st_exit_block(void)
 
-{  
+{
     extern int cur_block;
     STACK_REC *curr;
 
     if (cur_block <= 1)
 	bug("Cannot exit from block 0 or 1 in \"st_exit_block\".\n");
     else
-    {	
+    {
 	curr = block_stack[cur_block];
 
 	while (curr != NULL)
@@ -254,7 +248,7 @@ void st_exit_block(void)
 /*
 **  Function: st_get_cur_block
 **
-**  Purpose: return block number for current block 
+**  Purpose: return block number for current block
 **
 **  Notes:
 */
@@ -271,7 +265,7 @@ int st_get_cur_block(void)
 **
 **  Purpose: parameter: idr ST_ID pointer to bucket record
 return: id field of bucket record which is
-pointer to actual string in string pool area 
+pointer to actual string in string pool area
 **
 **  Notes:
 */
@@ -299,7 +293,7 @@ char *st_get_id_str(ST_ID idr)
 **  Notes:
 */
 
-void st_init_symtab(void)   
+void st_init_symtab(void)
 
 {
     int i;
@@ -332,10 +326,10 @@ void st_init_symtab(void)
 /*
 **  Function: st_install
 **
-**  Purpose: create stack record, determine current block, link into block 
-stack list by inserting in front, and push onto appropriate id 
-stack, establish back link to home id bucket      
-return true(1) if installed else false(0) if already installed 
+**  Purpose: create stack record, determine current block, link into block
+stack list by inserting in front, and push onto appropriate id
+stack, establish back link to home id bucket
+return true(1) if installed else false(0) if already installed
 **
 **  Notes:
 */
@@ -362,7 +356,7 @@ BOOLEAN st_install(ST_ID id, ST_DR data)
 	}
 
     /* allocate stack record space from pool */
-    if ((new_sr = alloc_stack_rec()) == NULL)  
+    if ((new_sr = alloc_stack_rec()) == NULL)
 	fatal("Unable to allocate stack record space.\n");
     else
     {
@@ -407,10 +401,10 @@ returns : if found, returns pointer to data record else null
 
 ST_DR st_lookup(ST_ID id, int *block)
 
-{ 
+{
     ST_BUCKET_REC *tmpbr;
 
-    if ((tmpbr = (ST_BUCKET_REC *)id) != NULL) 
+    if ((tmpbr = (ST_BUCKET_REC *)id) != NULL)
     {
 	if (tmpbr->sr_top == NULL)
 	    return NULL;
@@ -419,7 +413,7 @@ ST_DR st_lookup(ST_ID id, int *block)
 	    *block = tmpbr->sr_top->block_num;
 	    return(tmpbr->sr_top->data_rec);
 	}
-    } 
+    }
     else
 	return NULL;
 }
@@ -429,7 +423,7 @@ ST_DR st_lookup(ST_ID id, int *block)
 **  Function: st_replace
 **
 **  Purpose: parameters : id is ST_ID to home bucket record
-data is a user data record 
+data is a user data record
 returns :  if data record already exists, replace it with input
 and return TRUE; else return FALSE.
 **
@@ -438,10 +432,10 @@ and return TRUE; else return FALSE.
 
 BOOLEAN st_replace(ST_ID id, ST_DR data)
 
-{ 
+{
     ST_BUCKET_REC *tmpbr;
 
-    if ((tmpbr = (ST_BUCKET_REC *)id) != NULL) 
+    if ((tmpbr = (ST_BUCKET_REC *)id) != NULL)
     {
 	if (tmpbr->sr_top == NULL)
 	    return FALSE;
@@ -450,17 +444,16 @@ BOOLEAN st_replace(ST_ID id, ST_DR data)
 	    tmpbr->sr_top->data_rec = data;
 	    return TRUE;
 	}
-    } 
+    }
     else
 	return TRUE;
 }
-
 
 /***************************************************************************/
 /*
 **  Function: st_lookup_id
 **
-**  Purpose: this routine takes a pointer to a character string/identifier 
+**  Purpose: this routine takes a pointer to a character string/identifier
 and returns the bucket record pointer as a ST_ID pointer
 if the id has been entered else returns NULL
 **
@@ -469,11 +462,11 @@ if the id has been entered else returns NULL
 
 ST_ID st_lookup_id(char *itm)
 
-{	
+{
     ST_BUCKET_REC  *tmp_br;
     int ht_ent;
     char *tmpid;
-	
+
     ht_ent = st_hash(itm);   /*  get hash number */
 
     tmp_br = hash_table[ht_ent];
@@ -504,8 +497,8 @@ char *st_save_string(const char *str)
 
 {
     char *pstr;
-	
-    if ((pstr = alloc_str(strlen(str))) == NULL)	
+
+    if ((pstr = alloc_str(strlen(str))) == NULL)
 	fatal("Ran out of mem in \"st_save_string\".\n");
     else
 	strcpy(pstr,str);
@@ -567,7 +560,7 @@ void st_dump (void)
 **  Function: st_dump_block
 **
 **  Purpose: routine to dump a requested block's stack records
-	     parameter : block number to dump 
+	     parameter : block number to dump
 **
 **  Notes:
 */
@@ -582,10 +575,10 @@ void st_dump_block(int num)
     if (num < 0 || num > cur_block)
 	msg("bad block number: current block is %d", cur_block);
 
-    if ((gosr = block_stack[num]) != NULL) 
+    if ((gosr = block_stack[num]) != NULL)
     {
 	while (gosr != NULL)
-	{ 
+	{
 	    msg("\n    Dump: block num =%d",gosr->block_num);
 	    msg("    Dump: home_bucket = %d",gosr->home_br);
 	    msg("    Dump: next record in stack = %d",gosr->next_sr);
@@ -636,12 +629,11 @@ void st_dump_st_id (ST_ID idptr)
 /*                                                                     */
 /***********************************************************************/
 
-
 #define BRPOOL     	200
 #define SRPOOL		200
 #define	STRPOOL		200
 
-static char  *strp = NULL;    
+static char  *strp = NULL;
 static int strpool_num = STRPOOL;
 
 static ST_BUCKET_REC brbuff[BRPOOL]; /* pool area and ptr for bucket records */
@@ -659,7 +651,7 @@ static int spool_num = 0;            /* count of used records */
 **  Function: alloc_str
 **
 **  Purpose: this routine returns a pointer to where the character
-	     string was placed in the string pool area 
+	     string was placed in the string pool area
 **
 **  Notes:
 */
@@ -671,7 +663,7 @@ static char *alloc_str(int n)
 	strpool_num = strpool_num + n + 1;
     else   /* not enough room */
     {
-	if ((strp = malloc(STRPOOL)) != NULL) 
+	if ((strp = malloc(STRPOOL)) != NULL)
 	    strpool_num = n + 1;
 	else
 	    fatal("Ran out of mem in \"alloc_str\"\n");
@@ -687,7 +679,7 @@ static char *alloc_str(int n)
 **  Function: allod_hash_rec
 **
 **  Purpose: this routine returns a pointer to a bucket record
-	     from the pool of available records 
+	     from the pool of available records
 **
 **  Notes:
 */
@@ -723,7 +715,7 @@ static ST_BUCKET_REC *alloc_hash_rec(void)
 **  Function: alloc_stack_rec
 **
 **  Purpose: routine returns a pointer to a stack record
-from the pool of available records 
+from the pool of available records
 **
 **  Notes:
 */
@@ -777,7 +769,7 @@ static STACK_REC *alloc_stack_rec(void)
 **  Purpose: st_hash -
      	     parameter : string id
 	     purpose : to calculate a hash table lookup value
-	     return  : integer entry to hash table 
+	     return  : integer entry to hash table
 **
 **  Notes:
 */
@@ -791,11 +783,10 @@ static int st_hash (char *id)
 	sum = (37 * sum + *id) % HT_LENGTH;
 
     return sum;
-} 
+}
 
 void st_warn_shadow (int flag)
 
 {
     L_warn_shadow = flag;
 }
-

@@ -8,7 +8,6 @@ var
    a,b : Integer;
    c   : Char;
 
-
 procedure print_one; External;
 procedure print_two; External;
 procedure print_three; External;
@@ -23,7 +22,6 @@ procedure print_is_the; External;
 procedure print_grooviest; External;
 procedure print_newline; External;
 
-
 begin
 
    a := 3;
@@ -31,7 +29,7 @@ begin
    case a of
      5..10: print_oops;
      1..3:
-        begin   
+        begin
 	   print_one;
 	   print_two;
 	   print_three
@@ -45,7 +43,7 @@ begin
    case a of
      5..10: print_big;
      1..3:
-        begin   
+        begin
 	   print_one;
 	   print_two;
 	   print_three
@@ -53,13 +51,13 @@ begin
    else
       print_dunno
    end; { case }
-   
+
    a := 7;
 
    case a of
      5..10: print_big;
      1..3:
-        begin   
+        begin
 	   print_one;
 	   print_two;
 	   print_three
@@ -67,7 +65,7 @@ begin
    else
       print_dunno
    end; { case }
-   
+
    print_newline
 
 end.

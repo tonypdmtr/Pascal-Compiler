@@ -23,7 +23,6 @@ void comment(int);
 void count();
 char * convert_id(const char *), * convert_str_const(const char *);
 
-
 YYSTYPE yylval;
 
 %}
@@ -157,7 +156,6 @@ E			[Ee][+-]?{D}+
 
 %%
 
-
 int yywrap()
 {
     return 1;
@@ -218,7 +216,6 @@ void count()
     }
 }
 
-
 int digit(char c)
 {
     if (isdigit(c))
@@ -227,7 +224,6 @@ int digit(char c)
 	return toupper(c) - 'A' + 10;
     bug("Non-hex digit found: %c", c);
 }
-
 
 /* Determines if the given character can legally follow a backslash
    in a Pascal string constant */
@@ -246,7 +242,6 @@ BOOLEAN is_escchar(char c)
 
     bug("is_escchar: failed to return inside switch");
 }
-
 
 char * convert_id(const char * s)
 {

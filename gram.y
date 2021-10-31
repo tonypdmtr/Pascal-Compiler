@@ -174,14 +174,14 @@ int case_top = -1;
 %token <y_string> p_ODD p_EOF p_EOLN p_MAXINT p_TRUE p_FALSE
 
 /* Additional redefinable identifiers for Borland Pascal */
-%token bp_RANDOM bp_RANDOMIZE 
+%token bp_RANDOM bp_RANDOMIZE
 %token <y_string> BREAK CONTINUE
 
 /* redefinable keyword extensions */
-%token <y_string> RETURN_ RESULT EXIT FAIL 
-%token p_CLOSE CONJUGATE p_DEFINESIZE 
+%token <y_string> RETURN_ RESULT EXIT FAIL
+%token p_CLOSE CONJUGATE p_DEFINESIZE
 %token <y_string> SIZEOF
-%token <y_string> BITSIZEOF 
+%token <y_string> BITSIZEOF
 %token ALIGNOF TYPEOF gpc_RETURNADDRESS gpc_FRAMEADDRESS
 %token LEX_LABEL_ADDR
 
@@ -250,14 +250,14 @@ optional_par_id_list:
     /* empty */  {}
   | '(' id_list ')'  { $$ = $2; }
   ;
-  
+
 id_list:
     new_identifier  { $$ = build_var_id_list(NULL, $1); }
-  | id_list ',' new_identifier  { $$ = build_var_id_list($1, $3); } 
+  | id_list ',' new_identifier  { $$ = build_var_id_list($1, $3); }
   ;
 
 typename:
-    LEX_ID  { $$ = check_typename(st_enter_id($1)); } 
+    LEX_ID  { $$ = check_typename(st_enter_id($1)); }
   ;
 
 identifier:
@@ -271,55 +271,55 @@ new_identifier:
 new_identifier_1: /* default actions for all */
 LEX_ID  { $$ = st_enter_id($1); }
 /* Standard Pascal constants */
-  | p_MAXINT  
-  | p_FALSE  
-| p_TRUE  
+  | p_MAXINT
+  | p_FALSE
+| p_TRUE
 /* Standard Pascal I/O */
-  | p_INPUT  
-  | p_OUTPUT  
-  | p_REWRITE  
-  | p_RESET 
-  | p_PUT 
-  | p_GET  
-  | p_WRITE  
+  | p_INPUT
+  | p_OUTPUT
+  | p_REWRITE
+  | p_RESET
+  | p_PUT
+  | p_GET
+  | p_WRITE
   | p_READ
-  | p_WRITELN 
+  | p_WRITELN
   | p_READLN
   | p_PAGE
-  | p_EOF 
+  | p_EOF
   | p_EOLN
 /* Standard Pascal heap handling */
-  | p_NEW 
-  | p_DISPOSE 
+  | p_NEW
+  | p_DISPOSE
 /* Standard Pascal arithmetic */
-  | p_ABS  
-  | p_SQR  
-  | p_SIN  
-  | p_COS  
-  | p_EXP 
+  | p_ABS
+  | p_SQR
+  | p_SIN
+  | p_COS
+  | p_EXP
   | p_LN
   | p_SQRT
   | p_ARCTAN
-  | p_TRUNC  
-  | p_ROUND  
+  | p_TRUNC
+  | p_ROUND
 /* Standard Pascal transfer functions */
   | p_PACK
   | p_UNPACK
 /* Standard Pascal ordinal functions */
-  | p_ORD 
-  | p_CHR  
+  | p_ORD
+  | p_CHR
   | p_SUCC
-  | p_PRED  
-  | p_ODD  
+  | p_PRED
+  | p_ODD
 /* Other extensions */
-  | BREAK  
-  | CONTINUE  
-  | RETURN_  
-  | RESULT  
-  | EXIT  
-  | FAIL  
-  | SIZEOF  
-  | BITSIZEOF 
+  | BREAK
+  | CONTINUE
+  | RETURN_
+  | RESULT
+  | EXIT
+  | FAIL
+  | SIZEOF
+  | BITSIZEOF
   ;
 
 import_or_any_declaration_part:
@@ -516,7 +516,7 @@ new_structured_type: /* pass TYPE through */
   | unpacked_structured_type  { $$ = $1; }
   ;
 
-unpacked_structured_type: /* pass TYPE through */ 
+unpacked_structured_type: /* pass TYPE through */
     array_type  { $$ = $1; }
   | file_type  {}
   | set_type  {}
@@ -529,11 +529,10 @@ array_type: /* builds array TYPE */
     LEX_ARRAY '[' array_index_list ']' LEX_OF type_denoter  { $$ = check_array($6, $3); }
   ;
 
-array_index_list: 
+array_index_list:
     ordinal_index_type  { $$ = create_list_from_type( $1 ); }
   | array_index_list ',' ordinal_index_type  { $$ = concatenate_index_lists($1, $3); }
   ;
-
 
 ordinal_index_type: /* default actions to pass TYPE through */
     new_ordinal_type  { $$ = $1; }
@@ -549,7 +548,6 @@ direct_access_index_type:
     /* empty */  {}
   | '[' ordinal_index_type ']'  {}
   ;
-
 
 /* sets */
 set_type:
@@ -605,13 +603,13 @@ variant:
   ;
 
 case_constant_list:
-    one_case_constant {$$ = $1;} 
+    one_case_constant {$$ = $1;}
   | case_constant_list ',' one_case_constant  {}
   ;
 
 one_case_constant:
     static_expression  { TYPETAG type; long val;
-                         if (get_case_value($1, &val, &type) == TRUE) {  
+                         if (get_case_value($1, &val, &type) == TRUE) {
                             $$ = new_case_value(type, val, val);
                          }
                          else {
@@ -648,7 +646,7 @@ variable_declaration: //type is cint
   ;
   ;
 
-function_declaration: 
+function_declaration:
     function_heading semi directive_list semi  { build_func_decl($1.id, $1.type, $3); }
   | function_heading semi { $<y_cint>$ = enter_function($1.id, $1.type, st_get_id_str($1.id)); }
     any_declaration_part  { enter_func_body(st_get_id_str($1.id), $1.type, $<y_cint>3); }
@@ -666,12 +664,12 @@ directive_list:
   ;
 
 directive:
-    LEX_FORWARD  { $$ = DIR_FORWARD;  } 
+    LEX_FORWARD  { $$ = DIR_FORWARD;  }
   | LEX_EXTERNAL { $$ = DIR_EXTERNAL; }
   ;
 
 functiontype:
-    /* empty */   {} 
+    /* empty */   {}
   | ':' typename  { $$ = check_function_type($2); }
   ;
 
@@ -785,7 +783,7 @@ simple_if:
                                    encode_expr($2);
                                    char* end_if = new_symbol();
                                    b_cond_jump(TYSIGNEDCHAR,B_ZERO,end_if); //jump if false
-                                   $<y_string>$ = end_if; 
+                                   $<y_string>$ = end_if;
                                  }
                               }
     LEX_THEN statement        { $$ = $<y_string>3; }
@@ -846,7 +844,7 @@ while_statement:
                                  {
                                       b_cond_jump(TYSIGNEDCHAR,B_ZERO,current_exit_label());
                                  }
-    LEX_DO statement             { 
+    LEX_DO statement             {
                                       b_jump($<y_string>3); //jumps to start of loop
                                  }
   ;
@@ -906,7 +904,7 @@ variable_or_function_access_maybe_assignment:
 
 rest_of_statement:
     /* Empty */  { $$ = NULL; }
-  | LEX_ASSIGN expression  { $$ = $2; } 
+  | LEX_ASSIGN expression  { $$ = $2; }
   ;
 
 standard_procedure_statement:

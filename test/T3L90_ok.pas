@@ -8,7 +8,6 @@ var
    a,b : Integer;
    c   : Char;
 
-
 procedure print_one; External;
 procedure print_two; External;
 procedure print_three; External;
@@ -21,7 +20,6 @@ procedure print_712; External;
 procedure print_is_the; External;
 procedure print_grooviest; External;
 procedure print_newline; External;
-
 
 begin
 
@@ -79,7 +77,6 @@ begin
       print_dunno
    end; { case }
 
-
    { This next part is a lot easier with constant-folding. }
 
    c := chr(3);
@@ -89,7 +86,7 @@ begin
         begin
 	   case c of
 	     chr(1),chr(2),chr(4) : print_oops;
-	     chr(3)		  : 
+	     chr(3)		  :
 	        begin
 		   print_712;
 		   print_is_the
@@ -97,15 +94,15 @@ begin
 	   end; { case }
 	   print_grooviest
 	end
-   else	       
+   else
       print_oops;
       case ord(c) of
 	1,2,3,4	: print_oops
-      else	
+      else
 	 print_oops
       end; { case }
    end; { case }
-   
+
    print_newline
 
 end.

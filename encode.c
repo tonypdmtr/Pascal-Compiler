@@ -6,7 +6,6 @@
 int exit_label = -1;
 char* exit_label_stack[100];
 
-
 void encode_unop(EXPR_UNOP op, EXPR expr);
 void encode_binop(EXPR_BINOP out, EXPR expr);
 void encode_fcall(EXPR func, EXPR_LIST args);
@@ -43,8 +42,7 @@ BOOLEAN is_exit_label() {
    else {
       return FALSE;
    }
-}   
-   
+}
 
 void simple_allocate_space (char *id, TYPE type)
 {
@@ -141,7 +139,7 @@ void decl(TYPE type, VAR_ID_LIST list_id)
 			case TYENUM:
 				bug("illegal typetag (%d) in \"get_size\"", tag);
 				break;
-			case TYFUNC:	
+			case TYFUNC:
 				break;
 			case TYSUBRANGE:
 				b_skip(size);
@@ -193,27 +191,23 @@ void decl(TYPE type, VAR_ID_LIST list_id)
 	}
 }
 
-
 int get_array_size(TYPE a_type, int align) {
 	long low, high;
 	TYPE object;
 	TYPE type;
 	unsigned int a_size = align;
 	INDEX_LIST indices;
-	
 
 	type = a_type;
 	while (ty_query(type) == TYARRAY) {
 		type = ty_query_array(type, &indices);
-		while (indices != NULL) { 
+		while (indices != NULL) {
 			object = ty_query_subrange(indices->type,&low,&high);
 			a_size *= high - low + 1;
 
-		
 			indices = indices->next;
 		}
 	}
-
 
 	return a_size;
 }
@@ -254,7 +248,7 @@ int simple_size(TYPE type)
 			length = 4;
 			break;
 		case TYDOUBLE:
-			length = 8;	
+			length = 8;
 			break;
 		case TYLONGDOUBLE:
 			length = 8;
@@ -377,7 +371,7 @@ void exit_func_body(char *global_func_name, TYPE type) {
    //query function
    func_type = ty_query_func(type, &params, &check);
    func_tag = ty_query(func_type);
-   
+
    //pops the function id from the global stack;
    fi_top--;
 
@@ -397,11 +391,11 @@ void exit_func_body(char *global_func_name, TYPE type) {
 
 void encode_expr(EXPR expr)
 {
-    
+
   if (expr == NULL) {
     bug("Expression is null ");
   }
-  
+
   switch (expr->tag) {
     case LFUN:
     case ERROR: break;
@@ -423,7 +417,7 @@ void encode_expr(EXPR expr)
     case LVAR: 		b_push_loc_addr(0);
 
      		        int i = 0;
-      			for (i = 0; i < expr->u.lvar.link_count; i++) 
+      			for (i = 0; i < expr->u.lvar.link_count; i++)
 			{
 				b_offset(FUNC_LINK_OFFSET);
 				b_deref(TYPTR);
@@ -434,12 +428,12 @@ void encode_expr(EXPR expr)
                           {
 				b_deref(TYPTR);
       			  }
-   		   
+
                         break;
 
     case NULLOP:       b_push_const_int(0);
       		       break;
-   
+
     case UNOP:         encode_unop(expr->u.unop.op, expr);
       		       break;
 
@@ -450,7 +444,7 @@ void encode_expr(EXPR expr)
       		       break;
     case ARRAY_ACCESS:
                        break;
- 
+
   }
 
 }
@@ -462,7 +456,7 @@ void encode_unop(EXPR_UNOP op, EXPR expr)
   ST_ID id;
   TYPE type, base_type;
   BOOLEAN converted_to_int;
-  
+
   encode_expr(expr->u.unop.operand);
 
   converted_to_int = FALSE;
@@ -474,34 +468,34 @@ void encode_unop(EXPR_UNOP op, EXPR expr)
 
     case INDIR_OP:
     case UPLUS_OP: break;
-    case CONVERT_OP:      if(tag==TYSUBRANGE) 
-			    { 
+    case CONVERT_OP:      if(tag==TYSUBRANGE)
+			    {
 				base_type = ty_query_subrange(expr->u.unop.operand->type, &low, &high);
 				b_convert(TYSUBRANGE, ty_query(base_type));
-      			    } 
+      			    }
 			  else if(tag==TYPTR)
-			    { 
+			    {
 
-     		            } 
+     		            }
 			 else
-			    { 
+			    {
 				b_convert(tag, rval_tag);
       			    }
      			 break;
      case NEG_OP:   b_negate(tag); break;
-   
+
      case ORD_OP: if(tag==TYUNSIGNEDCHAR)
 	            {
 			b_convert(tag, TYSIGNEDLONGINT);
       		    }
                   break;
      case CHR_OP:
-    		  if(tag==TYSIGNEDLONGINT) 
+    		  if(tag==TYSIGNEDLONGINT)
 		    {
 		        b_convert(tag, TYUNSIGNEDCHAR);
     		    }
                   break;
-  
+
      case UN_SUCC_OP:   if(tag!=TYSIGNEDLONGINT)
 			   {
 				b_convert(tag,TYSIGNEDLONGINT);
@@ -509,7 +503,7 @@ void encode_unop(EXPR_UNOP op, EXPR expr)
      			    }
      			 b_push_const_int(1);
      			 b_arith_rel_op(B_ADD, TYSIGNEDLONGINT);
-     			 if(converted_to_int==TRUE) 
+     			 if(converted_to_int==TRUE)
 			   {
 				b_convert(TYSIGNEDLONGINT,tag);
     			   }
@@ -540,7 +534,7 @@ void encode_unop(EXPR_UNOP op, EXPR expr)
                        b_assign(TYPTR);
                        b_pop();
                        break;
-   
+
     case DISPOSE_OP:   b_load_arg(TYPTR);
                        b_funcall_by_name("free", TYVOID);
                        break;
@@ -577,35 +571,33 @@ void encode_binop(EXPR_BINOP out, EXPR expr)
      case DIV_OP: b_arith_rel_op(B_DIV, type_tag); break;
 
      case MOD_OP: b_arith_rel_op(B_MOD, type_tag); break;
-    
+
      case REALDIV_OP: b_arith_rel_op(B_DIV, type_tag); break;
-    
+
      case EQ_OP:b_arith_rel_op(B_EQ, type_tag);   break;
 
      case LESS_OP: b_arith_rel_op(B_LT, type_tag); break;
-    
+
      case LE_OP: b_arith_rel_op(B_LE, type_tag); break;
-    
+
      case NE_OP: b_arith_rel_op(B_NE, type_tag); break;
-    
+
      case GE_OP: b_arith_rel_op(B_GE, type_tag); break;
-    
+
      case GREATER_OP: b_arith_rel_op(B_GT, type_tag); break;
-   
+
     case ASSIGN_OP:  if(expr->u.binop.left->tag == LVAR)
 			 {
 			     b_push_loc_addr(expr->u.binop.left->u.lvar.offset);
     	                  }
-      
+
      		     if(left_type_tag != right_type_tag)
 			 {
 	                      b_convert(right_type_tag, left_type_tag);
                          }
-     
- 
+
     		     b_assign(left_type_tag);
-      
-     
+
      			 b_pop();
    		     break;
   }
@@ -620,13 +612,13 @@ void encode_fcall(EXPR func, EXPR_LIST args)
   TYPETAG arg_tag;
   PARAM_LIST func_params;
   BOOLEAN check_args;
-  
+
   func_ret_type = ty_query_func(func->type, &func_params, &check_args);
   arg_list_size = 0;
   t_arg = args;
 
-  if(func->tag == GID) 
-    { 
+  if(func->tag == GID)
+    {
         func_gname = st_get_id_str(func->u.gid);
     }
   t_arg = args;
@@ -636,9 +628,9 @@ void encode_fcall(EXPR func, EXPR_LIST args)
   	  if(ty_query(t_arg->expr->type)==TYDOUBLE||ty_query(t_arg->expr->type)==TYFLOAT)
             {
      	        arg_list_size+=8;
-            } 
+            }
           else
-   	    { 
+   	    {
    	        arg_list_size+=4;
             }
 
@@ -647,7 +639,7 @@ void encode_fcall(EXPR func, EXPR_LIST args)
 
   b_alloc_arglist(arg_list_size);
   t_arg=args;
-  while(t_arg!=NULL) 
+  while(t_arg!=NULL)
      {
 
   	  encode_expr(t_arg->expr);
@@ -655,77 +647,74 @@ void encode_fcall(EXPR func, EXPR_LIST args)
   	  if(func_params != NULL)
  	     {
   		    if(func_params->is_ref==TRUE)
-			 { 
+			 {
 				if(is_lval(t_arg->expr)==FALSE)
 				    {
 					  bug("Function argument expected to be lval in encode_fcall_expr");
-				    } 
-	
-				if(ty_test_equality(t_arg->expr->type, func_params->type)==FALSE) 
+				    }
+
+				if(ty_test_equality(t_arg->expr->type, func_params->type)==FALSE)
 				    {
 					   error("Parameter types do not match");
 				    }
-	
-	
+
 				b_load_arg(TYPTR);
-    			  } 
-		    else 
-                         { 
-				if(is_lval(t_arg->expr)==TRUE) 
+    			  }
+		    else
+                         {
+				if(is_lval(t_arg->expr)==TRUE)
                                    {
 	 				 b_deref(arg_tag);
 			      	   }
-			       if(arg_tag==TYSIGNEDCHAR||arg_tag==TYUNSIGNEDCHAR) 
-				   { 
+			       if(arg_tag==TYSIGNEDCHAR||arg_tag==TYUNSIGNEDCHAR)
+				   {
 
 	 				 b_convert(arg_tag,TYSIGNEDLONGINT);
 					  b_load_arg(TYSIGNEDLONGINT);
-				   } 
-				else if(arg_tag==TYFLOAT) 
-				   { 
+				   }
+				else if(arg_tag==TYFLOAT)
+				   {
 	 				 b_convert(arg_tag,TYDOUBLE);
 	 				 b_load_arg(TYDOUBLE);
-				    } 
-				else 
-				    { 
+				    }
+				else
+				    {
 	 				 b_load_arg(arg_tag);
 				    }
     	                  }
-             } 
-         else 
-             {     
-		if(is_lval(t_arg->expr)==TRUE) 
+             }
+         else
+             {
+		if(is_lval(t_arg->expr)==TRUE)
 		    {
 	 		 b_deref(arg_tag);
 		    }
-		if(arg_tag==TYSIGNEDCHAR||arg_tag==TYUNSIGNEDCHAR) 
-		    { 
+		if(arg_tag==TYSIGNEDCHAR||arg_tag==TYUNSIGNEDCHAR)
+		    {
 	 		 b_convert(arg_tag, TYSIGNEDLONGINT);
 		         b_load_arg(TYSIGNEDLONGINT);
-	            } 
+	            }
                 else if(arg_tag==TYFLOAT)
-                   { 
+                   {
 	  		b_convert(arg_tag,TYDOUBLE);
 		        b_load_arg(TYDOUBLE);
-		   } 
-		else 
-		   { 
+		   }
+		else
+		   {
 		        b_load_arg(arg_tag);
 		   }
               }
 
     t_arg=t_arg->next;
 
-    if(func_params!=NULL) 
+    if(func_params!=NULL)
 	{
             func_params=func_params->next;
         }
 
    }
-  
-  
-  b_funcall_by_name(func_gname,ty_query(func_ret_type));
 
+  b_funcall_by_name(func_gname,ty_query(func_ret_type));
 
 }
 
@@ -766,11 +755,7 @@ void encode_dispatch(VAL_LIST vals, char * label){
 			b_label(match);
 	}
 
-
-
-
 }//end encode_dispatch
-
 
 char * encode_for_preamble(EXPR var, EXPR init, int dir, EXPR limit){
 	TYPETAG var_type = ty_query(var->type);
@@ -821,8 +806,6 @@ char * encode_for_preamble(EXPR var, EXPR init, int dir, EXPR limit){
 	//Emits a conditional jump on true
 	b_cond_jump (limit_type, B_NONZERO, label);
 
-
-
 	//sets values.
 	b_duplicate(var_type);
 
@@ -831,9 +814,6 @@ char * encode_for_preamble(EXPR var, EXPR init, int dir, EXPR limit){
 	else
 		b_inc_dec (var_type, B_PRE_DEC, 0);
 
-
 	return var->strval;
 
 }//end encode_for_preamble
-
-

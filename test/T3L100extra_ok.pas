@@ -12,7 +12,6 @@ var
    raaa : array[2..4, 0..5, 1..4] of Real;
    r    : Real;
 
-
 procedure print_nl; External;
 procedure print_dot; External;
 procedure print_even; External;
@@ -20,7 +19,6 @@ procedure print_odd; External;
 procedure print_j; External;
 procedure print_i_j_values; External;
 procedure print_oops; External;
-
 
 begin
    for i := 1 to 10 do

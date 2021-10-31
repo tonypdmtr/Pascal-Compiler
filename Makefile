@@ -29,7 +29,7 @@ LEX = flex
 #yes
 CFLAGS = -g
 #no
-#CFLAGS = 
+#CFLAGS =
 
 #
 # which back end?
@@ -51,7 +51,7 @@ main.o: main.c defs.h types.h symtab.h
 
 tree.o: tree.c tree.h types.h message.h symtab.h
 
-encode.o: encode.c encode.h tree.h types.h message.h backend-x86.h symtab.h 
+encode.o: encode.c encode.h tree.h types.h message.h backend-x86.h symtab.h
 
 types.o: types.c types.h symtab.h message.h
 
@@ -82,4 +82,3 @@ testfile:
 
 clean:
 	-rm -f ppc3 *.o y.tab.h y.output y.tab.c *.err *.s
-

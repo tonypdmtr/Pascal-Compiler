@@ -1,4 +1,3 @@
-
 /****************************************************************/
 /*								*/
 /*	CSCE531 - "Pascal" and "C" Compilers			*/
@@ -70,7 +69,7 @@ void stdr_dump(ST_DR stdr)
 	case TYPENAME:	msg("	TYPENAME");
 			break;
 	default:
-		bug("illegal tag in \"stdr_dump\""); 
+		bug("illegal tag in \"stdr_dump\"");
 	}
 	switch(stdr->tag) {
 	case ECONST:	msgn("		type = ");
@@ -106,7 +105,6 @@ void stdr_dump(ST_DR stdr)
 			break;
 	}
 }
-
 
 /****************************************************************/
 /*
