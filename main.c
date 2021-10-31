@@ -1,8 +1,12 @@
-#include "defs.h"
-#include "types.h"
-#include "symtab.h"
-
 #include <stdio.h>
+
+#include "backend-x86.c"
+#include "encode.c"
+#include "message.c"
+#include "symtab.c"
+#include "tree.c"
+#include "types.c"
+#include "utils.c"
 
 FILE *errfp;		/* file to which message.c will write */
 
