@@ -19,7 +19,7 @@ void new_exit_label() {
 char* old_exit_label() {
    if(exit_label < 0) {
       bug("Exit label stack is empty");
-      return;
+      return NULL;
    }
    char* label = exit_label_stack[exit_label];
    exit_label--;
@@ -29,7 +29,7 @@ char* old_exit_label() {
 char* current_exit_label() {
    if (exit_label < 0) {
       bug("Exit label stack is empty");
-      return;
+      return NULL;
    }
    char* label = exit_label_stack[exit_label];
    return label;
@@ -42,6 +42,82 @@ BOOLEAN is_exit_label() {
    else {
       return FALSE;
    }
+}
+
+int simple_size(TYPE type)
+{
+          TYPETAG tag;
+          unsigned int length;
+          INDEX_LIST i;
+
+          tag = ty_query(type);
+          switch (tag)
+          {
+                    case TYARRAY:
+                              length = simple_size(ty_query_array(type, &i));
+                              break;
+                    case TYSET:
+                              bug("illegal typetag (%d) in \"get_size\"", tag);
+                              break;
+                    case TYPTR:
+                              length = 4;
+                              break;
+                    case TYSTRUCT:
+                              bug("illegal typetag (%d) in \"get_size\"", tag);
+                              break;
+                    case TYUNION:
+                              bug("illegal typetag (%d) in \"get_size\"", tag);
+                              break;
+                    case TYENUM:
+                              bug("illegal typetag (%d) in \"get_size\"", tag);
+                              break;
+                    case TYFUNC:
+                              break;
+                    case TYSUBRANGE:
+                              length = simple_size(ty_strip_modifier(type));
+                              break;
+                    case TYFLOAT:
+                              length = 4;
+                              break;
+                    case TYDOUBLE:
+                              length = 8;
+                              break;
+                    case TYLONGDOUBLE:
+                              length = 8;
+                              break;
+                    case TYUNSIGNEDINT:
+                              length = 4;
+                              break;
+                    case TYUNSIGNEDCHAR:
+                              length = 1;
+                              break;
+                    case TYUNSIGNEDSHORTINT:
+                              length = 2;
+                              break;
+                    case TYUNSIGNEDLONGINT:
+                              length = 4;
+                              break;
+                    case TYSIGNEDCHAR:
+                              length = 1;
+                              break;
+                    case TYSIGNEDINT:
+                              length = 4;
+                              break;
+                    case TYSIGNEDLONGINT:
+                              length = 4;
+                              break;
+                    case TYSIGNEDSHORTINT:
+                              length = 2;
+                              break;
+                    case TYVOID:
+                              break;
+                    case TYERROR:
+                              break;
+                    default:
+                              bug("illegal typetag (%d) in \"ty_print_type\"", tag);
+          }
+
+          return length;
 }
 
 void simple_allocate_space (char *id, TYPE type)
@@ -210,82 +286,6 @@ int get_array_size(TYPE a_type, int align) {
 	}
 
 	return a_size;
-}
-
-int simple_size(TYPE type)
-{
-	TYPETAG tag;
-	unsigned int length;
-	INDEX_LIST i;
-
-	tag = ty_query(type);
-	switch (tag)
-	{
-		case TYARRAY:
-			length = simple_size(ty_query_array(type, &i));
-			break;
-		case TYSET:
-			bug("illegal typetag (%d) in \"get_size\"", tag);
-			break;
-		case TYPTR:
-			length = 4;
-			break;
-		case TYSTRUCT:
-			bug("illegal typetag (%d) in \"get_size\"", tag);
-			break;
-		case TYUNION:
-			bug("illegal typetag (%d) in \"get_size\"", tag);
-			break;
-		case TYENUM:
-			bug("illegal typetag (%d) in \"get_size\"", tag);
-			break;
-		case TYFUNC:
-			break;
-		case TYSUBRANGE:
-			length = simple_size(ty_strip_modifier(type));
-			break;
-		case TYFLOAT:
-			length = 4;
-			break;
-		case TYDOUBLE:
-			length = 8;
-			break;
-		case TYLONGDOUBLE:
-			length = 8;
-			break;
-		case TYUNSIGNEDINT:
-			length = 4;
-			break;
-		case TYUNSIGNEDCHAR:
-			length = 1;
-			break;
-		case TYUNSIGNEDSHORTINT:
-			length = 2;
-			break;
-		case TYUNSIGNEDLONGINT:
-			length = 4;
-			break;
-		case TYSIGNEDCHAR:
-			length = 1;
-			break;
-		case TYSIGNEDINT:
-			length = 4;
-			break;
-		case TYSIGNEDLONGINT:
-			length = 4;
-			break;
-		case TYSIGNEDSHORTINT:
-			length = 2;
-			break;
-		case TYVOID:
-			break;
-		case TYERROR:
-			break;
-		default:
-			bug("illegal typetag (%d) in \"ty_print_type\"", tag);
-	}
-
-	return length;
 }
 
 /*************************************************************************
